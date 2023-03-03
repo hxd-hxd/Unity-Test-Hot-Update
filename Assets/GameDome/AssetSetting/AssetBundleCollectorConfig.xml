@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root Version="2.2">
+  <Common AutoAddressable="True" UniqueBundleName="False" ShowPackageView="False" ShowEditorAlias="True" />
+  <Package PackageName="DefaultPackage" PackageDesc="">
+    <Group GroupName="scenes" GroupDesc="" AssetTags="">
+      <Collector CollectPath="Assets/GameDome/Scenes" CollectGUID="79f0622b69cae384f84d80088029f8e3" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectAll" AssetTags="" />
+    </Group>
+    <Group GroupName="ugui" GroupDesc="" AssetTags="">
+      <Collector CollectPath="Assets/GameDome/Textures" CollectGUID="cfd108e1a81bb4845b379f8dcfadf5a6" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+      <Collector CollectPath="Assets/GameDome/Prefabs/UIPanel" CollectGUID="3d33bffe4c143e54690ad57be079b755" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackSeparately" FilterRule="CollectAll" AssetTags="" />
+    </Group>
+  </Package>
+</root>

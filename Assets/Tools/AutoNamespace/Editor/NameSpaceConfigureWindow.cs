@@ -30,6 +30,8 @@ namespace AutoNamespace
         [SerializeField]
         NamespaceConfig nc;
 
+        static Vector2 sv = Vector2.zero;
+
         int explainMaxWidth = 140;
 
         static bool pathFoldoutHeaderGroup = true;
@@ -62,6 +64,8 @@ namespace AutoNamespace
 
         private void OnGUI()
         {
+            sv = GUILayout.BeginScrollView(sv);
+
             // 地址配置信息
             //EditorGUI.BeginChangeCheck();
             //{
@@ -197,6 +201,8 @@ namespace AutoNamespace
 
                 AssetDatabase.Refresh();
             }
+
+            GUILayout.EndScrollView();
         }
 
         // 检查命名空间配置列表是否允许修改
@@ -302,11 +308,11 @@ namespace AutoNamespace
                 content = CorrectPath(content);
                 content = GetUnityAssetPath(content);
 
-                    EditorGUILayout.LabelField(content);
+                EditorGUILayout.LabelField(content);
                 if (navigationToOptions)
                 {
                     if (GUILayout.Button("选中", GUILayout.MaxWidth(100)))
-                    { 
+                    {
                         //string fileD = Path.GetDirectoryName(content);
                         //string fileName = Path.GetFileName(content);
                         //string fileE = Path.GetExtension(content);

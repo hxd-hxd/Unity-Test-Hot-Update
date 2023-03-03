@@ -16,6 +16,9 @@
         "AutoNamespace",
         "TestMenu",
         "Framework",
-        "TMPro"
+        "TMPro",
+        "Framework.Test",
+        "Framework.YooAssetExpress",
+        "Test.TestYooAsset"
     ]
 }

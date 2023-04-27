@@ -117,6 +117,28 @@ public class Coroutines : MonoBehaviour
             _coroutine = null;
         }
     }
+
+    /// <summary>
+    /// 延时处理
+    /// </summary>
+    /// <param name="time"></param>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    public static Coroutine Delay(float time, System.Action e)
+    {
+        if (instance == null) return null;
+        return Instance.StartCoroutine(Instance.DelayCoroutine(time, e));
+    }
+    /// <summary>
+    /// 延时处理
+    /// </summary>
+    /// <param name="e"></param>
+    /// <returns></returns>
+    public static Coroutine Delay(System.Action e)
+    {
+        if (instance == null) return null;
+        return Instance.StartCoroutine(Instance.DelayCoroutine(e));
+    }
 }
 
 /// <summary>

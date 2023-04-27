@@ -21,6 +21,7 @@ namespace BatchOperationToolsUtility
         public string pathFull;
 
         //public TextAsset file = new TextAsset() { name = BOTConstant.DefaultName };
+        [NonSerialized]
         public TextAsset file = BOTConstant.DefaultTextAsset;
 
     }

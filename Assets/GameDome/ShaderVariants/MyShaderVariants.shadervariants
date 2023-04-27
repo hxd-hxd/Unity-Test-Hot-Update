@@ -58,5 +58,7 @@ ShaderVariantCollection:
   - first: {fileID: 9103, guid: 0000000000000000f000000000000000, type: 0}
     second:
       variants:
-      - keywords: 
+      - keywords: BILLBOARD_FACE_CAMERA_POS
+        passType: 0
+      - keywords: BILLBOARD_FACE_CAMERA_POS UNITY_HDR_ON
         passType: 0

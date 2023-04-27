@@ -32,6 +32,7 @@ MonoBehaviour:
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
     - GroupName: ugui
       GroupDesc: 
       AssetTags: 
@@ -44,6 +45,7 @@ MonoBehaviour:
         PackRuleName: PackDirectory
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
       - CollectPath: Assets/GameDome/Prefabs/UIPanel
         CollectorGUID: 3d33bffe4c143e54690ad57be079b755
         CollectorType: 0
@@ -51,6 +53,7 @@ MonoBehaviour:
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 
     - GroupName: shader
       GroupDesc: 
       AssetTags: 
@@ -63,6 +66,7 @@ MonoBehaviour:
         PackRuleName: PackShaderVariants
         FilterRuleName: CollectShaderVariants
         AssetTags: 
+        UserData: 
   - PackageName: SelectivityPackage
     PackageDesc: 
     Groups:
@@ -78,3 +82,4 @@ MonoBehaviour:
         PackRuleName: PackSeparately
         FilterRuleName: CollectAll
         AssetTags: 
+        UserData: 

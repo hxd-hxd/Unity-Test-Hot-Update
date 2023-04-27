@@ -35,15 +35,34 @@ namespace BatchOperationToolsUtility
         /// <summary>
         /// 排除指定的文件类型
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="fileType"></param>
         /// <returns></returns>
         public static string[] ExcludeType(this string[] paths, string fileType)
         {
             List<string> vs = new List<string>();
             for (int i = 0; i < paths.Length; i++)
             {
-                string[] strs = paths[i].Split('.');
-                if (strs[strs.Length - 1] != fileType)
+                string e = Path.GetExtension(paths[i]);
+                if (e != fileType)
+                {
+                    vs.Add(paths[i]);
+                }
+            }
+
+            return vs.ToArray();
+        }
+        /// <summary>
+        /// 查找指定的文件类型
+        /// </summary>
+        /// <param name="fileType"></param>
+        /// <returns></returns>
+        public static string[] IncludeType(this string[] paths, string fileType)
+        {
+            List<string> vs = new List<string>();
+            for (int i = 0; i < paths.Length; i++)
+            {
+                string e = Path.GetExtension(paths[i]);
+                if (e == fileType)
                 {
                     vs.Add(paths[i]);
                 }
@@ -74,7 +93,7 @@ namespace BatchOperationToolsUtility
             return value;
         }
         /// <summary>
-        /// 移除空字符串
+        /// 移除字符串空格
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -105,34 +124,6 @@ namespace BatchOperationToolsUtility
         {
             string[] strs = Regex.Split(value, split);
             return strs;
-        }
-
-        /// <summary>
-        /// 按字符串拆分
-        /// </summary>
-        /// <param name="splits">请注意拆分字符串的顺序</param>
-        /// <returns></returns>
-        private static string[] Split(this string value, params string[] splits)
-        {
-            List<string> vs = new List<string>();
-
-
-            for (int i = 0; i < splits.Length; i++)
-            {
-                string[] strs = value.Split(splits[i]);
-
-            }
-
-            return vs.ToArray();
-        }
-        private static string[] Split(this string value, int index, params string[] splits)
-        {
-            List<string> vs = new List<string>();
-
-            //string[] strs = value.Split(splits[i]);
-
-
-            return vs.ToArray();
         }
 
         /// <summary>

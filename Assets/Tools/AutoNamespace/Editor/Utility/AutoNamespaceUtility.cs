@@ -10,8 +10,6 @@ namespace AutoNamespace
     {
         //static NamespaceConfig nc;
 
-        #region 路径
-
         /// <summary>
         /// 允许配置的动态路径
         /// <para>ps：修改时的格式限定为："/你要修改的目录"</para>
@@ -160,7 +158,6 @@ namespace AutoNamespace
             }
         }
 
-        #endregion
 
         public static NamespaceConfig Read(string path)
         {

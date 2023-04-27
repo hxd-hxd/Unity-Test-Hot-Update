@@ -1,44 +1,50 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+
+using Framework;
+using Framework.YooAssetExpress;
+using global::YooAsset;
+
 namespace Test.TestYooAsset
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.IO;
-    using UnityEngine;
-
-    using Framework;
-    using Framework.YooAssetExpress;
-    using global::YooAsset;
-
     public class GameStart : MonoBehaviour
     {
         const float KB = 1024f;
         const float MB = 1048576f;
         const float GB = 1073741824f;
+        const float TB = 1099511627776f;
 
+        [Header("资源下载服务器地址")]
         //string hostServerIP = "http://10.0.2.2"; //安卓模拟器地址
         //string hostServerIP = "http://127.0.0.1";
         public string hostServerIP = "http://10.0.0.29";
+        [Header("资源在服务器上的根路径")]
         public string resPath = "CDN";      // 资源在服务器上的根路径
+        [Header("版本号路径")]
         public string gameVersion = "v1.0"; // 要更新的版本号
         // 资源包名，可能会有多个资源包
+        [Header("资源包名，可能会有多个资源包")]
         public string packageName = "DefaultPackage";
 
         /// <summary>
-        /// 资源系统运行模式
+        /// 资源系统模式
         /// </summary>
+        [Header("资源系统模式")]
         public EPlayMode PlayMode = EPlayMode.EditorSimulateMode;
 
         /// <summary>
         /// 最大尝试下载次数
         /// </summary>
-        [SerializeField]
-        private int maxTryDownloadNum = 3;
+        [Header("最大尝试下载次数")]
+        [SerializeField] private int maxTryDownloadNum = 3;
         /// <summary>
         /// 尝试下载次数
         /// </summary>
-        [SerializeField]
-        private int tryDownloadNum = 0;
+        [Header("尝试下载次数")]
+        [SerializeField] private int tryDownloadNum = 0;
 
 
         /// <summary>
@@ -287,6 +293,7 @@ namespace Test.TestYooAsset
 
         #endregion
 
+
         // 转换成 MB 显示值
         public string ToMB(long value)
         {
@@ -302,28 +309,28 @@ namespace Test.TestYooAsset
         private string GetHostServerURL()
         {
 
-//#if UNITY_EDITOR
-//            if (UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.Android)
-//                return $"{hostServerIP}/CDN/Android/{gameVersion}";
-//            else if (UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.iOS)
-//                return $"{hostServerIP}/CDN/IPhone/{gameVersion}";
-//            else if (UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)
-//                return $"{hostServerIP}/CDN/WebGL/{gameVersion}";
-//            else
-//                return $"{hostServerIP}/CDN/PC/{gameVersion}";
-//#else
-//			if (Application.platform == RuntimePlatform.Android)
-//				return $"{hostServerIP}/CDN/Android/{gameVersion}";
-//			else if (Application.platform == RuntimePlatform.IPhonePlayer)
-//				return $"{hostServerIP}/CDN/IPhone/{gameVersion}";
-//			else if (Application.platform == RuntimePlatform.WebGLPlayer)
-//				return $"{hostServerIP}/CDN/WebGL/{gameVersion}";
-//			else
-//				return $"{hostServerIP}/CDN/PC/{gameVersion}";
-//#endif
+            //#if UNITY_EDITOR
+            //            if (UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.Android)
+            //                return $"{hostServerIP}/CDN/Android/{gameVersion}";
+            //            else if (UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.iOS)
+            //                return $"{hostServerIP}/CDN/IPhone/{gameVersion}";
+            //            else if (UnityEditor.EditorUserBuildSettings.activeBuildTarget == UnityEditor.BuildTarget.WebGL)
+            //                return $"{hostServerIP}/CDN/WebGL/{gameVersion}";
+            //            else
+            //                return $"{hostServerIP}/CDN/PC/{gameVersion}";
+            //#else
+            //			if (Application.platform == RuntimePlatform.Android)
+            //				return $"{hostServerIP}/CDN/Android/{gameVersion}";
+            //			else if (Application.platform == RuntimePlatform.IPhonePlayer)
+            //				return $"{hostServerIP}/CDN/IPhone/{gameVersion}";
+            //			else if (Application.platform == RuntimePlatform.WebGLPlayer)
+            //				return $"{hostServerIP}/CDN/WebGL/{gameVersion}";
+            //			else
+            //				return $"{hostServerIP}/CDN/PC/{gameVersion}";
+            //#endif
 
 
-            return $"{hostServerIP}/{resPath}/{ApplicationUtility.platform}/{gameVersion}";
+            return $"{hostServerIP}/{resPath}/{PlatformUtility.platform}/{gameVersion}";
         }
 
         /// <summary>
@@ -353,7 +360,7 @@ namespace Test.TestYooAsset
                 throw new NotImplementedException();
             }
 
-            public FileStream LoadFromStream(DecryptFileInfo fileInfo)
+            public Stream LoadFromStream(DecryptFileInfo fileInfo)
             {
                 BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open);
                 return bundleStream;

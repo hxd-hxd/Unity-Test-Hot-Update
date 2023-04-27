@@ -14,14 +14,17 @@ using Framework;
 
 namespace Test.TestYooAsset
 {
+    [ExecuteInEditMode]
     public class InitBGPanel : MonoBehaviour
     {
+        Text screenInfo;
 
         void Start()
         {
-            
+            screenInfo = transform.FindOf<Text>("screenInfo");
 
-            transform.FindOf<Button>("loadPanelBtn")?.onClick.AddListener(() =>
+            transform.FindOf<Button>("loadPanelBtn")?.onClick.AddListener(
+                async () =>
             {
                 Log.Debuger("开始加载 RightPanel");
 
@@ -29,15 +32,26 @@ namespace Test.TestYooAsset
 
                 Log.Debuger($"加载结果 {asset}");
 
-                asset.Completed += (_) =>
-                {
-                    Log.Debuger($"加载完成 {asset}");
+                await asset.Task;
 
-                    Log.Debuger($"实例化 {Instantiate(asset.AssetObject)}");
+                Log.Debuger($"加载完成 {asset}");
 
-                };
+                Log.Debuger($"实例化 {Instantiate(asset.AssetObject)}");
+
+                //asset.Completed += (_) =>
+                //{
+                //    Log.Debuger($"加载完成 {asset}");
+
+                //    Log.Debuger($"实例化 {Instantiate(asset.AssetObject)}");
+
+                //};
             });
         }
 
+        private void Update()
+        {
+            screenInfo.text = $"{Screen.width} x {Screen.height}";
+        }
     }
+
 }

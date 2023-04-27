@@ -1,6 +1,6 @@
 {
     "ShaderTotalCount": 10,
-    "VariantTotalCount": 11,
+    "VariantTotalCount": 12,
     "ShaderVariantInfos": [
         {
             "AssetPath": "Resources/unity_builtin_extra",
@@ -126,7 +126,14 @@
                 {
                     "PassType": 0,
                     "Keywords": [
-                        ""
+                        "BILLBOARD_FACE_CAMERA_POS"
+                    ]
+                },
+                {
+                    "PassType": 0,
+                    "Keywords": [
+                        "BILLBOARD_FACE_CAMERA_POS",
+                        "UNITY_HDR_ON"
                     ]
                 }
             ]

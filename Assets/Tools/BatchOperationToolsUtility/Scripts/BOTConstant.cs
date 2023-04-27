@@ -12,6 +12,8 @@ namespace BatchOperationToolsUtility
 {
     public static class BOTConstant
     {
+        public const string configPath = "Assets/Tools/BatchOperationToolsUtility/Editor/BOTConfigure.txt";
+
         public const string ns = "namespace";
 
         public const string DefaultName = "None (CSharp)";

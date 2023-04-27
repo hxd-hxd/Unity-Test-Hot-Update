@@ -25,17 +25,17 @@ namespace BatchOperationToolsUtility
         /// <summary>
         /// 启用条件
         /// </summary>
-        public static bool Enable 
+        public static bool Enable
         {
             get
             {
                 return !EditorApplication.isPlaying;
 
-//#if UNITY_EDITOR
-//                return !EditorApplication.isPlaying;
-//#else
-//                return false;
-//#endif
+                //#if UNITY_EDITOR
+                //                return !EditorApplication.isPlaying;
+                //#else
+                //                return false;
+                //#endif
             }
         }
 
@@ -83,17 +83,16 @@ namespace BatchOperationToolsUtility
                 return BOTConstant.FileExtensionList.Contains(Path.GetExtension(AssetDatabase.GetAssetPath(obj)));
             }
 
-            /// <summary>
-            /// 执行对命名空间的
-            /// </summary>
-            /// <param name="namespaceFileList"></param>
-            public static void ExecutionNamespace(List<OperationItem> namespaceFileList)
-            {
-
-            }
         }
 
-
+        public static void LoadAsset(List<OperationItem> namespaceFileList)
+        {
+            for (int i = 0; i < namespaceFileList.Count; i++)
+            {
+                var item = namespaceFileList[i];
+                item.file = AssetDatabase.LoadAssetAtPath<TextAsset>(item.pathAsset);
+            }
+        }
 
         /// <summary>
         /// 对操作项列表执行修改
@@ -103,6 +102,10 @@ namespace BatchOperationToolsUtility
         {
             for (int i = 0; i < namespaceFileList.Count; i++)
             {
+                if (namespaceFileList[i].file == BOTConstant.DefaultTextAsset || namespaceFileList[i].file == null)
+                {
+                    continue;// 如果从列表中删除，则不修改
+                }
                 Execution(namespaceFileList[i].pathFull);
             }
         }
@@ -120,7 +123,7 @@ namespace BatchOperationToolsUtility
                 newValue = ExecutionOperationAdd(lines);
             }
 
-            File.WriteAllText(filePath, newValue);
+            File.WriteAllText(filePath, newValue, Encoding.UTF8);
         }
 
         // 可否执行修改操作
@@ -213,7 +216,7 @@ namespace BatchOperationToolsUtility
                 string[] strs = value.Split(ns);
                 if (strs[0].Contains("/"))
                 {
-                    string[] vs = strs[0].Split("\r\n");
+                    string[] vs = strs[0].Split(Environment.NewLine);
                     string last = vs[vs.Length - 1];
                     if (last.Contains("//"))
                     {
@@ -272,10 +275,10 @@ namespace BatchOperationToolsUtility
                 //    line = line.Split("/*")[0];
                 //}
 
-                if (line.ToLower().Contains("class")) split = line.Split("class");
-                else if (line.ToLower().Contains("struct")) split = line.Split("struct");
-                else if (line.ToLower().Contains("interface")) split = line.Split("interface");
-                else if (line.ToLower().Contains("enum")) split = line.Split("enum");
+                if (line.Contains("class")) split = line.Split("class");
+                else if (line.Contains("struct")) split = line.Split("struct");
+                else if (line.Contains("interface")) split = line.Split("interface");
+                else if (line.Contains("enum")) split = line.Split("enum");
 
 
                 if (split == null)
@@ -305,20 +308,7 @@ namespace BatchOperationToolsUtility
         /// <returns></returns>
         public static bool IsClassLine(string line)
         {
-            if (line.ToLower().Contains("class"))
-            {
-                string[] split = line.Split("class");
-
-                if (split.Length <= 1) return false;
-                if (split[0].ContainsOne("//", "/*"))
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return CheckLine(line, "class");
         }
         /// <summary>
         /// 是否是定义结构的行
@@ -327,20 +317,7 @@ namespace BatchOperationToolsUtility
         /// <returns></returns>
         public static bool IsStructLine(string line)
         {
-            if (line.ToLower().Contains("struct"))
-            {
-                string[] split = line.Split("struct");
-
-                if (split.Length <= 1) return false;
-                if (split[0].ContainsOne("//", "/*"))
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return CheckLine(line, "struct");
         }
         /// <summary>
         /// 是否是定义接口的行
@@ -349,20 +326,7 @@ namespace BatchOperationToolsUtility
         /// <returns></returns>
         public static bool IsInterfaceLine(string line)
         {
-            if (line.ToLower().Contains("interface"))
-            {
-                string[] split = line.Split("interface");
-
-                if (split.Length <= 1) return false;
-                if (split[0].ContainsOne("//", "/*"))
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return CheckLine(line, "interface");
         }
         /// <summary>
         /// 是否是定义枚举的行
@@ -371,20 +335,7 @@ namespace BatchOperationToolsUtility
         /// <returns></returns>
         public static bool IsEnumLine(string line)
         {
-            if (line.ToLower().Contains("enum"))
-            {
-                string[] split = line.Split("enum");
-
-                if (split.Length <= 1) return false;
-                if (split[0].ContainsOne("//", "/*"))
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return CheckLine(line, "enum");
         }
 
         /// <summary>
@@ -394,9 +345,18 @@ namespace BatchOperationToolsUtility
         /// <returns></returns>
         public static bool IsUsingLine(string line)
         {
-            if (line.ToLower().Contains("using"))
+            return CheckLine(line, "using");
+        }
+
+        /// <summary>
+        /// 检查有效行
+        /// </summary>
+        /// <returns></returns>
+        public static bool CheckLine(string line, string typeName)
+        {
+            if (line.Contains(typeName))
             {
-                string[] split = line.Split("using");
+                string[] split = line.Split(typeName);
 
                 if (split.Length <= 1) return false;
                 if (split[0].ContainsOne("//", "/*"))
@@ -418,12 +378,12 @@ namespace BatchOperationToolsUtility
         public static bool IsAttributeLine(string line)
         {
             line = line.Remove(" ", "\t", "\r");
-            if (line[0] != '[')
+            if (line[0] == '[')
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -434,13 +394,63 @@ namespace BatchOperationToolsUtility
         public static bool IsCommentsLine(string line)
         {
             line = line.Remove(" ", "\t", "\r");
-            if (line[0] == '/')
+            if (line[0] == '/' || line[0] == '*')
             {
-                return false;
+                return true;
             }
 
-            return true;
+            return false;
         }
+
+        /// <summary>
+        /// 是否区域注释行
+        /// <para>例：</para>
+        /// <code>
+        /// /* 开始区域注释
+        ///  * 这是注释行
+        ///    这行也是注释，在一个注释区域内，前方不需要带任何注释表示符： / 或 * 
+        ///    在 开始标识符 到 结束标识符 之间的任何东西都将视为注释
+        /// // 这也是注释 */ 结束区域注释
+        /// </code>
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        public static bool IsAreaCommentsLine(string line)
+        {
+            line = line.Remove(" ", "\t", "\r");
+
+            if (line.StartsWith("/*") || line[0] == '/' || line[0] == '*')// 开始行
+            {
+                return true;
+            }
+            if (IsAreaCommentsEndLine(line))// 结束行
+            {
+                return true;
+            }
+
+            return false;
+        }
+        /// <summary>
+        /// 是否是区域注释开始行
+        /// <para>注意：此方法只判断单行，整体的区域是多行，需自行处理结束</para>
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        private static bool IsAreaCommentsStartLine(string line)
+        {
+            return line.Contains("/*");// 开始行
+        }
+        /// <summary>
+        /// 是否是区域注释结束行
+        /// <para>注意：此方法只判断单行，整体的区域是多行，需自行处理开始</para>
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        private static bool IsAreaCommentsEndLine(string line)
+        {
+            return line.Contains("*/");// 结束行
+        }
+
 
 
         /// <summary>
@@ -525,7 +535,7 @@ namespace BatchOperationToolsUtility
             string Front = lines[0];
             string queen = lines[1];
 
-            string newline = "\r\n";// 换行
+            string newline = Environment.NewLine;// 换行
             char sign = '/';        // 拆分符
             if (queen.ContainsAll("/", "{"))
             {
@@ -598,90 +608,139 @@ namespace BatchOperationToolsUtility
             for (int i = 0; i < lines.Length; i++)
             {
                 lines[i] = NamespaceModify(lines[i], nsValue);
-                sb.Append(lines[i]).Append("\r\n");
+                sb.Append(lines[i]).Append(Environment.NewLine);
             }
 
             return sb.ToString();
         }
 
+
+        /// <summary>
+        /// 添加命名空间
+        /// </summary>
+        /// <param name="values">代码</param>
+        /// <param name="nsValue">命名空间值</param>
+        /// <returns></returns>
+        public static string NamespaceAdd(string nsValue, string codeContext)
+        {
+            return NamespaceAdd(nsValue, codeContext.Split(Environment.NewLine));
+        }
         /// <summary>
         /// 添加命名空间
         /// </summary>
         /// <param name="values">包含完整代码内容的数组</param>
         /// <param name="nsValue">命名空间值</param>
         /// <returns></returns>
-        public static string NamespaceAdd(string nsValue, params string[] values)
+        public static string NamespaceAdd(string nsValue, params string[] lines)
         {
             StringBuilder sb = new StringBuilder();
-            List<string> lines = new List<string>();
 
-            #region 弃用
-            //// 记录定义类的代码行的索引
-            //// 说明可在此行之前添加命名空间
-            //int indexClass = 0;
 
-            //bool addFinish = false;
-
-            //for (int i = 0; i < values.Length - 1; i++)
-            //    {
-            //    string value = values[i];
-            //    if (!addFinish)
-            //    {
-            //        // 空行直接添加
-            //        if (string.IsNullOrWhiteSpace(value))
-            //        {
-            //            lines.Add(value);
-            //            continue;
-            //        }
-
-            //        // 是注释行
-            //        if (IsCommentsLine(value))
-            //        {
-            //            lines.Add(value);
-            //            continue;
-            //        }
-            //        // 判断特性
-            //        if (IsAttributeLine(value))
-            //        {
-            //            lines.Add(value);
-            //            continue;
-            //        }
-
-            //        // 引用名直接添加
-            //        if (IsUsingLine(value))
-            //        {
-            //            lines.Add(value);
-            //            continue;
-            //        }
-
-            //        // 添加命名空间
-            //        //sb.Append(ns).Append(" ").Append(namespaceValue).Append("\r\n{\r\n\t");
-            //        addFinish = true;
-            //        indexClass = i;
-            //    }
-            //    else
-            //    {
-            //        lines.Add(value);
-            //    }
-            //}
-
-            //sb.Append("}"); 
-            #endregion
-
-            if (!IsHaveNamespace(values))
+            if (!IsHaveNamespace(lines))
             {
-                sb.Append("namespace ").Append(nsValue).Append("\r\n{");
-                for (int i = 0; i < values.Length; i++)
+                int start = 0;
+
+                // 检查跳过行
+                bool inCommentsArea = false;        // 在注释区域中
+                bool startCheckComments = false;    // 开始检查注释
+                bool isInterpretComments = false;   // 是否是解释类型的注释
+                //bool isSkip = false;    // 是否处于跳过阶段
+                int startSkip = 0;      // 记录开始跳过行的索引
+                //int addNameLine = 0;    // 添加 命名空间 的行
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    sb.Append("\r\n\t").Append(values[i]);
+                    string line = lines[i];
+
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        //if (!inCommentsArea)
+                        //{
+                        //    startSkip = i + 1;
+                        //}
+                        continue;// 跳过空行
+                    }
+
+                    // 检查注释，例：
+                    /* 此行开始注释
+                     * 
+                     * 
+                    
+                    需要检查类似这样的注释块
+
+                    //测试 */ //此行结束注释
+                    if (inCommentsArea)// 处于区域注释
+                    {
+                        startCheckComments = true;
+                        if (IsAreaCommentsEndLine(line))// 检查注释结束
+                        {
+                            inCommentsArea = false;
+                            startCheckComments = false;
+                        }
+                        continue;
+                    }
+                    if (IsCommentsLine(line))
+                    {
+                        if (startCheckComments)
+                        {
+                            continue;// 已经处于注释则跳过
+                        }
+
+                        startCheckComments = true;// 开始注释
+                        //isSkip = true;
+
+                        if (IsAreaCommentsLine(line) && IsAreaCommentsStartLine(line))
+                            inCommentsArea = true;
+                        startSkip = i;// 添加命名空间时跳过行的起始点
+
+                        continue;
+                    }
+                    else
+                    {
+                        startCheckComments = false;
+                    }
+
+                    if (IsAttributeLine(line))
+                    {
+                        continue;
+                    }
+
+                    if (IsUsingLine(line))
+                    {
+                        startSkip = i + 1;
+                        //isSkip = false;
+                        continue;
+                    }
+
+
+                    if (IsTypeLine(line))
+                    {
+                        //addNameLine = startSkip;
+                        break;
+                    }
+
+                    // 其他位置条件
+                    //startSkip = i;
                 }
-                sb.Append("\r\n}");
+
+                string s = "";
+                for (int i = start; i < lines.Length; i++)
+                {
+                    if (startSkip == i)
+                    {
+                        s = "\t";
+                        sb.Append(Environment.NewLine).Append("namespace ").Append(nsValue).Append("\r\n{");
+                        sb.Append("\r\n\t").Append(lines[i]);
+                        continue;
+                    }
+                    sb.Append(Environment.NewLine).Append(s).Append(lines[i]);
+                }
+                sb.Append(Environment.NewLine).Append("}");
             }
             else
             {
-                for (int i = 0; i < values.Length; i++)
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    sb.Append(values[i]).Append("\r\n");
+                    sb.Append(lines[i]).Append(Environment.NewLine);
                 }
             }
 

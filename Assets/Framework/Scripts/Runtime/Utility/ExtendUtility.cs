@@ -36,6 +36,16 @@ public static class ExtendUtility
         return target;
     }
     /// <summary>
+    /// 尝试在所有子节点中找到指定名称的第一个
+    /// </summary>
+    /// <returns></returns>
+    public static bool TryFindOf(this Transform obj, string name, out Transform result)
+    {
+        result = obj.FindOf(name);
+
+        return result;
+    }
+    /// <summary>
     /// 在所有子节点中找到指定名称的第一个，并获取其上指定组件
     /// </summary>
     /// <param name="obj"></param>
@@ -46,6 +56,20 @@ public static class ExtendUtility
         return FindOf(obj, name)?.GetComponent<T>();
     }
     /// <summary>
+    /// 在所有子节点中找到指定名称的第一个，并获取其上指定组件
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="obj"></param>
+    /// <param name="name"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static bool TryFindOf<T>(this Transform obj, string name, out T result) where T : Component
+    {
+        result = obj.FindOf<T>(name);
+
+        return result;
+    }
+    /// <summary>
     /// 在所有子节点中找到指定名称的第一个
     /// </summary>
     /// <param name="obj"></param>
@@ -54,6 +78,16 @@ public static class ExtendUtility
     public static Transform FindOf(this GameObject obj, string name)
     {
         return FindOf(obj.transform, name);
+    }
+    /// <summary>
+    /// 尝试在所有子节点中找到指定名称的第一个
+    /// </summary>
+    /// <returns></returns>
+    public static bool TryFindOf(this GameObject obj, string name, out Transform result)
+    {
+        result = obj.FindOf(name);
+
+        return result;
     }
 
     /// <summary>

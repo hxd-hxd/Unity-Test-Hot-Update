@@ -2,6 +2,8 @@
 // 创建日期：2021/8/3 16:52:10
 // -------------------------
 
+#pragma warning disable 0219
+
 using System;
 using System.IO;
 using System.Collections;
@@ -10,10 +12,10 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
 
+using System.Text;
 using Object = UnityEngine.Object;
 using static BatchOperationToolsUtility.BOTConstant;
 using static BatchOperationToolsUtility.BOTGlobalVariable;
-using System.Text;
 
 namespace BatchOperationToolsUtility
 {

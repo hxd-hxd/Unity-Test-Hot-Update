@@ -35,7 +35,7 @@ public class Coroutines : MonoBehaviour
     static void OnRuntimeMethodLoad()
     {
         GameObject go = new GameObject();
-        go.name = "[Coroutines]";
+        go.name = "Coroutines";
         go.AddComponent<Coroutines>();
     }
 
@@ -130,7 +130,7 @@ public class Coroutines : MonoBehaviour
         return Instance.StartCoroutine(Instance.DelayCoroutine(time, e));
     }
     /// <summary>
-    /// 延时处理
+    /// 延时一帧处理
     /// </summary>
     /// <param name="e"></param>
     /// <returns></returns>

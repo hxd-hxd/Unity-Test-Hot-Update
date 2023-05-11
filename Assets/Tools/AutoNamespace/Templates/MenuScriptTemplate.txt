@@ -3,6 +3,9 @@
 // 创建日期：#_CREATE_TIME_#
 // -------------------------
 
+#pragma warning disable 0414
+#pragma warning disable 0219
+
 using UnityEngine;
 using UnityEditor;
 

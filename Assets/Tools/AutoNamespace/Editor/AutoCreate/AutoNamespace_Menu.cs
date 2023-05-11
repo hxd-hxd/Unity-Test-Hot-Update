@@ -1,6 +1,6 @@
 // -------------------------
 // 由工具自动创建，请勿手动修改
-// 创建日期：2022/9/5 16:16:55
+// 创建日期：2023/5/9 15:31:08
 // -------------------------
 
 using UnityEngine;
@@ -46,6 +46,19 @@ namespace AutoNamespace
         // 本方法用于控制菜单按钮 Framework 的启用
         [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Framework", true, 1000)]
         private static bool NamespaceMenuEnable_Framework()
+        {
+            return AutoNamespaceUtility.Enable();
+        }
+        
+
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Framework.HybridCLRExpress", false, 1000)]
+        private static void NamespaceMenu_Framework_HybridCLRExpress()
+        {
+            AutoNamespaceUtility.CreateCSharpScriptAsset("Framework.HybridCLRExpress");
+        }
+        // 本方法用于控制菜单按钮 Framework.HybridCLRExpress 的启用
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Framework.HybridCLRExpress", true, 1000)]
+        private static bool NamespaceMenuEnable_Framework_HybridCLRExpress()
         {
             return AutoNamespaceUtility.Enable();
         }

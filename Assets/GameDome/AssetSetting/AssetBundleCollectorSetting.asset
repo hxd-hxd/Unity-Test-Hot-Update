@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185f6993d5150494d98da50e26cb1c25, type: 3}
   m_Name: AssetBundleCollectorSetting
   m_EditorClassIdentifier: 
-  ShowPackageView: 1
+  ShowPackageView: 0
   EnableAddressable: 1
-  UniqueBundleName: 0
+  UniqueBundleName: 1
   ShowEditorAlias: 1
   Packages:
   - PackageName: DefaultPackage
@@ -68,7 +68,7 @@ MonoBehaviour:
         AssetTags: 
         UserData: 
   - PackageName: SelectivityPackage
-    PackageDesc: 
+    PackageDesc: "\u7531\u7528\u6237\u9009\u62E9\u6027\u4E0B\u8F7D\u7684\u8D44\u6E90\u5305"
     Groups:
     - GroupName: 3DItem
       GroupDesc: 

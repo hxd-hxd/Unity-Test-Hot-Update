@@ -115,6 +115,34 @@ public static class ExtendUtility
     }
 
     /// <summary>
+    /// 期望有此组件，没有则添加
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="transform"></param>
+    /// <returns></returns>
+    public static T ExpectComponent<T>(this Transform self) where T : Component
+    {
+        return ExpectComponent<T>(self.gameObject);
+    }
+
+    /// <summary>
+    /// 期望有此组件，没有则添加
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="transform"></param>
+    /// <returns></returns>
+    public static T ExpectComponent<T>(this GameObject self) where T : Component
+    {
+        //T cp = self.GetComponent<T>() ?? self.AddComponent<T>();
+        T cp = self.GetComponent<T>();
+        if (!cp)
+        {
+            cp = self.AddComponent<T>();
+        }
+        return cp;
+    }
+
+    /// <summary>
     /// 转为 Texture2D
     /// </summary>
     /// <param name="sprite"></param>

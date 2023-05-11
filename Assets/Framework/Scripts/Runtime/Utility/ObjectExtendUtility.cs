@@ -78,7 +78,7 @@ namespace Framework
             foreach (var itemOut in tOut.GetType().GetProperties())
             {
                 var itemIn = tInType.GetProperty(itemOut.Name); ;
-                if (itemIn != null)
+                if (itemIn != null && itemOut.CanWrite)
                 {
                     itemOut.SetValue(tOut, itemIn.GetValue(tIn));
                 }

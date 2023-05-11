@@ -13,3 +13,8 @@ Github 仓库：https://github.com/tuyoogame/YooAsset/tree/main
 	Name: package.openupm.cn
 	URL: https://package.openupm.cn
 	Scope(s): com.tuyoogame.yooasset
+
+
+作为热更库，代码全部需要放在本地！！！
+作为热更库，代码全部需要放在本地！！！
+作为热更库，代码全部需要放在本地！！！

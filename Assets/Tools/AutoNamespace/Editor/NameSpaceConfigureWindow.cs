@@ -1,4 +1,8 @@
-﻿using System.Collections;
+﻿
+#pragma warning disable 0414
+#pragma warning disable 0219
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;

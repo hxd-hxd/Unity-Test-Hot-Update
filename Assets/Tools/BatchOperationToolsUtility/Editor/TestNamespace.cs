@@ -2,6 +2,8 @@
 //// 创建日期：2021/8/13 17:15:58
 //// -------------------------
 
+#pragma warning disable 0219
+
 using System;
 using System.IO;
 using System.Collections;

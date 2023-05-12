@@ -22,9 +22,13 @@ namespace Framework
     {
 
 #if UNITY_EDITOR
-        public static T Create<T>() where T : ScriptableObject
+        public static T Create<T>(bool select = true) where T : ScriptableObject
         {
-            return Create<T>("Assets", typeof(T).Name);
+            return Create<T>("Assets", select);
+        }
+        public static T Create<T>(string path, bool select = true) where T : ScriptableObject
+        {
+            return Create<T>(path, typeof(T).Name, select);
         }
         /// <summary>
         /// 创建指定的 <see cref="ScriptableObject"/> 资源
@@ -33,7 +37,7 @@ namespace Framework
         /// <param name="_path"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public static T Create<T>(string _path, string name) where T : ScriptableObject
+        public static T Create<T>(string _path, string name, bool select = true) where T : ScriptableObject
         {
             T so = ScriptableObject.CreateInstance<T>();
 
@@ -58,7 +62,8 @@ namespace Framework
                 }
             AssetDatabase.CreateAsset(so, assetPath);
 
-            Selection.activeObject = so;
+            if(select) 
+                Selection.activeObject = so;
 
             AssetDatabase.Refresh();
 

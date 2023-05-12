@@ -24,17 +24,19 @@ namespace Framework.HybridCLRExpress
         /// <summary>
         /// 要拷贝到的目标路径
         /// </summary>
-        [TextArea]
+        [TextArea(2, 10)]
         public string copyPath = "Assets/HotUpdateAssemblies";
 
 #if UNITY_EDITOR
         // 等同使用 CreateAssetMenu 的效果
         [MenuItem("Assets/Create/Framework HybridCLRExpress/Create Assemblies Cfg")]
-        public static void Create()
+        static void InteriorCreate()
         {
-            //AssembliesCfg cfg = CreateInstance<AssembliesCfg>();
-            AssembliesCfg cfg = new AssembliesCfg();
-
+            Create();
+        }
+        public static AssembliesCfg Create()
+        {
+            AssembliesCfg cfg = null;
             string path = null;
             Object target = Selection.activeObject;
             if (target)
@@ -49,21 +51,9 @@ namespace Framework.HybridCLRExpress
             {
                 path = cfg.copyPath;
             }
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-
+            cfg = ScriptableObjectUtility.Create<AssembliesCfg>(path);
             //cfg.copyPath = path;
-            string cfgPath = $"{path}/Assemblies Cfg.asset";
-            if (File.Exists(cfgPath))
-                for (int i = 1; i < int.MaxValue; i++)
-                {
-                    cfgPath = $"{path}/Assemblies Cfg {i}.asset";
-                    if (!File.Exists(cfgPath)) break;
-                }
-            AssetDatabase.CreateAsset(cfg, cfgPath);
-
-            Selection.activeObject = cfg;
-
-            AssetDatabase.Refresh();
+            return cfg;
         }
 #endif
     }

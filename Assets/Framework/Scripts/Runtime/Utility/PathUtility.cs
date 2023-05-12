@@ -29,8 +29,20 @@ namespace Framework
             string l_path = path.Replace("\\", "/");
             //string[] strs = Regex.Split(l_path, "Assets/");
             //string assetsPath = $"Assets/{strs[strs.Length - 1]}";
-            string assetsPath = $"Assets{l_path.Replace(Application.dataPath, null)}";
+            string assetsPath = IsUnityAssetPath(path) ?
+                $"Assets{l_path.Replace(Application.dataPath, null)}" :
+                l_path;
             return assetsPath;
+        }
+        /// <summary>
+        /// 判断是否 Unity Assets 资源路径
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static bool IsUnityAssetPath(string path)
+        {
+            string l_path = path.Replace("\\", "/");
+            return l_path.Contains(Application.dataPath);
         }
     }
 }

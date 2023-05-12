@@ -18,54 +18,30 @@ namespace Framework.HybridCLRExpress
 {
     public static class AssembliesUtility
     {
-        public static AssembliesCfg _cfg;
+        private static AssembliesCfg _cfg;
+        /// <summary>
+        /// 程序集操作配置文件
+        /// </summary>
         public static AssembliesCfg cfg
         {
             get
             {
                 if (!_cfg)
                 {
-                    _cfg = GetAssembliesCfg(Application.dataPath);
+                    _cfg = GetAssembliesCfg();
+
+                    //Debug.Log("查找配置文件 AssembliesCfg");
+
+                    if (!_cfg)
+                    {
+                        _cfg = AssembliesCfg.Create();
+
+                        //Debug.Log("未找到配置文件 AssembliesCfg，创建");
+                    }
                 }
-                //if (!_cfg)
-                //{
-                //    _cfg = new AssembliesCfg();
-                //    string path = AssetDatabase.GetAssetPath(_cfg);
-                //    //AssetDatabase.MoveAsset(path, _cfg.copyPath);
-                //}
                 return _cfg;
             }
             set { _cfg = value; }
-        }
-        private static AssembliesCfg GetAssembliesCfg(string path)
-        {
-            AssembliesCfg l_cfg = null;
-
-            if (Directory.Exists(path))
-            {
-                string[] dirs = Directory.GetDirectories(path);
-                string[] files = Directory.GetFiles(path, "*.asset");
-
-                foreach (string file in files)
-                {
-                    string l_file = file.Replace("\\", "/");
-                    //string[] strs = Regex.Split(l_file, "Assets/");
-                    //string assetsFile = $"Assets/{strs[strs.Length - 1]}";
-                    string assetsFile = $"Assets{l_file.Replace(Application.dataPath, null)}";
-
-                    l_cfg = AssetDatabase.LoadAssetAtPath<AssembliesCfg>(assetsFile);
-                    if (l_cfg) break;
-                }
-                if (!l_cfg)
-                {
-                    foreach (string dir in dirs)
-                    {
-                        l_cfg = GetAssembliesCfg(dir);
-                    }
-                }
-            }
-
-            return l_cfg;
         }
 
         /// <summary>
@@ -82,6 +58,54 @@ namespace Framework.HybridCLRExpress
         /// 热更新程序集文件排除保留
         /// </summary>
         public static List<string> HotUpdateAssemblyFilesExcludePreserved => SettingsUtil.HotUpdateAssemblyFilesExcludePreserved;
+
+        public static AssembliesCfg GetAssembliesCfg()
+        {
+           return GetAssembliesCfg(Application.dataPath);
+        }
+        /// <summary>
+        /// 获取 <see cref="AssembliesCfg"/> 配置
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static AssembliesCfg GetAssembliesCfg(string path)
+        {
+            AssembliesCfg l_cfg = null;
+
+            if (Directory.Exists(path))
+            {
+                string[] dirs = Directory.GetDirectories(path);
+                string[] files = Directory.GetFiles(path, "*.asset");
+
+                foreach (string file in files)
+                {
+                    string assetsFile = PathUtility.GetUnityAssetPath(file);
+
+                    l_cfg = AssetDatabase.LoadAssetAtPath<AssembliesCfg>(assetsFile);
+
+                    //Log.Yellow($"找到 SO 文件：{assetsFile}");
+                    if (l_cfg)
+                    {
+                        //Log.Striking($"成功加载 AssembliesCfg SO 文件：{assetsFile}");
+                        break;
+                    }
+                }
+                if (!l_cfg)
+                {
+                    foreach (string dir in dirs)
+                    {
+                        l_cfg = GetAssembliesCfg(dir);
+                        if (l_cfg)
+                        {
+                            //Log.Striking($"成功加载 AssembliesCfg SO 文件，在目录：{dir}");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return l_cfg;
+        }
 
         public static void CopyHotUpdateAssembliesToStreamingAssets()
         {
@@ -107,11 +131,19 @@ namespace Framework.HybridCLRExpress
 
             string hotfixDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);// 获取对应平台的 DLL 生成目录
             string hotfixAssembliesDstDir = targetDir;// 目标目录
+            string hotfixAssembliesPlatformDir = $"{hotfixAssembliesDstDir}/{target}";// 目标平台目录
+
+            // 检查目录存在
+            if (!Directory.Exists(hotfixAssembliesPlatformDir))
+            {
+                Directory.CreateDirectory(hotfixAssembliesPlatformDir);
+            }
+
             foreach (var dll in SettingsUtil.HotUpdateAssemblyFilesExcludePreserved)
             {
                 string dllPath = $"{hotfixDllSrcDir}/{dll}";
                 string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
-                string dllBytesPath = $"{hotfixAssembliesDstDir}/{target}/{dll}{extension}";
+                string dllBytesPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";
                 File.Copy(dllPath, dllBytesPath, true);
                 Debug.Log($"[CopyHotUpdateAssembliesToDir] copy hotfix dll {dllPath} -> {dllBytesPath}");
             }

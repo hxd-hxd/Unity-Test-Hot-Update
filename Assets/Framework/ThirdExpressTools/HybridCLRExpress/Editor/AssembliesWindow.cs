@@ -11,9 +11,6 @@ using UnityEngine;
 using UnityEditor;
 using HybridCLR.Editor;
 using System.Linq;
-using UnityEditor.SearchService;
-using UnityEngine.tvOS;
-using log4net.Core;
 
 namespace Framework.HybridCLRExpress
 {
@@ -40,8 +37,8 @@ namespace Framework.HybridCLRExpress
         // 拷贝
         bool copyAllDll = false;        // 拷贝所有 DLL
         bool copyCurPlatformDll = true; // 拷贝当前平台 DLL
-        //string copyPath { get => AssembliesUtility.cfg.copyPath; set => AssembliesUtility.cfg.copyPath = value; }
-        string copyPath = "Assets/HotUpdateAssemblies";
+        string copyPath { get => AssembliesUtility.cfg.copyPath; set => AssembliesUtility.cfg.copyPath = value; }
+        //string copyPath = "Assets/HotUpdateAssemblies";
 
         GUIStyle whiteStyle = new GUIStyle();
         GUIStyle whiteButtonStyle = new GUIStyle();
@@ -64,7 +61,7 @@ namespace Framework.HybridCLRExpress
             whiteButtonStyle.stretchHeight = true;
             whiteButtonStyle.fixedHeight = 32;
 
-            var cfg = AssembliesUtility.cfg;
+            //var cfg = AssembliesUtility.cfg;
         }
 
         private void OnGUI()
@@ -149,26 +146,23 @@ namespace Framework.HybridCLRExpress
             GUILayout.Space(8);
 
             // 拷贝
-            copyPath = GUILayout.TextArea(copyPath);
+            copyPath = GUILayout.TextArea(copyPath, GUILayout.MinHeight(48));
             //AssembliesUtility.cfg.copyPath = copyPath;
             //copyCurPlatformDll = EditorGUILayout.ToggleLeft("拷贝当前平台 DLL", copyCurPlatformDll);
-            //copyAllDll = EditorGUILayout.ToggleLeft("拷贝所有 DLL", copyAllDll);
+            copyAllDll = EditorGUILayout.Toggle("拷贝所有 DLL", copyAllDll);
             if (GUILayout.Button("拷贝当前平台 DLL", whiteButtonStyle))
             {
-                if (Directory.Exists(copyPath))
-                {
-
-                }
+                AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath);
             }
-            if (GUILayout.Button("拷贝所有 DLL", whiteButtonStyle))
+            if (GUILayout.Button("拷贝所有平台 DLL", whiteButtonStyle))
             {
-                
+
             }
 
             GUILayout.Space(8);
 
             // 树状结构
-                GUILayout.Label("查看 DLL ", EditorStyles.boldLabel);
+            GUILayout.Label("查看 DLL ", EditorStyles.boldLabel);
             showAllDll = EditorGUILayout.ToggleLeft("显示所有 DLL", showAllDll);
             EditorGUILayout.BeginVertical("box");
             {

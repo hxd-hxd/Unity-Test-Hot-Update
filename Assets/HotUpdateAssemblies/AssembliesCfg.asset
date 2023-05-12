@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12da17c6a60ef2e41b10c2719164f89b, type: 3}
-  m_Name: Assemblies Cfg
+  m_Name: AssembliesCfg
   m_EditorClassIdentifier: 
   copyPath: Assets/HotUpdateAssemblies

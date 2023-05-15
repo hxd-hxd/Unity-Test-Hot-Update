@@ -21,7 +21,6 @@ namespace #_NAME_SPACE_#
     {
         /*
          * 这里的菜单路径自行修改
-         * 如通过本工具创建了两个及以上此脚本，则一定要修改
          */
         [MenuItem("Tools/Window/#_SCRIPT_NAME_#")]
         static void Open()
@@ -30,7 +29,7 @@ namespace #_NAME_SPACE_#
             my.minSize = new Vector2(450, 580);
         }
 
-        // 敞口打开时调用
+        // 窗口打开时调用
         private void OnEnable()
         {
             

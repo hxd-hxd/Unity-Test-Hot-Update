@@ -44,5 +44,7 @@ namespace Framework
             string l_path = path.Replace("\\", "/");
             return l_path.Contains(Application.dataPath);
         }
+
+
     }
 }

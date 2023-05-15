@@ -18,7 +18,7 @@ using UnityEditor;
 
 namespace Framework
 {
-    public static class ScriptableObjectUtility
+    public static partial class ScriptableObjectUtility
     {
 
 #if UNITY_EDITOR

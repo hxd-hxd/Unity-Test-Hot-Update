@@ -33,6 +33,7 @@ namespace Framework.HybridCLRExpress
         FlatFoldoutBranch rootFoldout;
         bool showAllDll = false;
         Vector2 rootFoldoutSV = Vector2.zero;
+        Vector2 fullSV = Vector2.zero;
 
         // 拷贝
         bool copyAllDll = false;        // 拷贝所有 DLL
@@ -42,6 +43,7 @@ namespace Framework.HybridCLRExpress
 
         GUIStyle whiteStyle = new GUIStyle();
         GUIStyle whiteButtonStyle = new GUIStyle();
+        GUIStyle yellowButtonStyle = new GUIStyle();
 
         private void OnEnable()
         {
@@ -61,11 +63,15 @@ namespace Framework.HybridCLRExpress
             whiteButtonStyle.stretchHeight = true;
             whiteButtonStyle.fixedHeight = 32;
 
+            yellowButtonStyle = whiteButtonStyle.CloneSelf();
+
             //var cfg = AssembliesUtility.cfg;
         }
 
         private void OnGUI()
         {
+            fullSV = EditorGUILayout.BeginScrollView(fullSV);
+
             var target = EditorUserBuildSettings.activeBuildTarget;
 
             bool hotUpdateDLLDirExists = Directory.Exists(hotUpdateDLLDir);// 检查根目录是否存在
@@ -145,6 +151,11 @@ namespace Framework.HybridCLRExpress
 
             GUILayout.Space(8);
 
+            // 配置文件
+            EditorGUILayout.ObjectField("相关保存配置", AssembliesUtility.cfg, AssembliesUtility.cfg.GetType(), false);
+
+            GUILayout.Space(8);
+
             // 拷贝
             copyPath = GUILayout.TextArea(copyPath, GUILayout.MinHeight(48));
             //AssembliesUtility.cfg.copyPath = copyPath;
@@ -153,17 +164,21 @@ namespace Framework.HybridCLRExpress
             if (GUILayout.Button("拷贝当前平台 DLL", whiteButtonStyle))
             {
                 AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath);
+
+                AssetDatabase.Refresh();
             }
             if (GUILayout.Button("拷贝所有平台 DLL", whiteButtonStyle))
             {
 
+                AssetDatabase.Refresh();
             }
 
             GUILayout.Space(8);
 
             // 树状结构
             GUILayout.Label("查看 DLL ", EditorStyles.boldLabel);
-            showAllDll = EditorGUILayout.ToggleLeft("显示所有 DLL", showAllDll);
+            //showAllDll = EditorGUILayout.ToggleLeft("显示所有 DLL", showAllDll);
+            showAllDll = EditorGUILayout.Toggle("显示所有 DLL", showAllDll);
             EditorGUILayout.BeginVertical("box");
             {
                 rootFoldoutSV = EditorGUILayout.BeginScrollView(rootFoldoutSV);
@@ -182,21 +197,34 @@ namespace Framework.HybridCLRExpress
                 EditorGUILayout.EndScrollView();
             }
             EditorGUILayout.EndVertical();
+
+            EditorGUILayout.EndScrollView();
         }
 
         #region GUI
+
+        static Texture _fileIconUnity;
+        static Texture fileIconUnity
+        {
+            get
+            {
+                if (_fileIconUnity == null) _fileIconUnity = AssetDatabase.GetCachedIcon("Assets");
+                return _fileIconUnity;
+            }
+        }
+
         // 显示树状结构分支
         public void BranchTree(FlatFoldoutBranch branchRoot, int level = 0)
         {
             string[] dllPlatformDirs = Directory.GetDirectories(branchRoot.path);
-            string[] dllPlatformFiles = Directory.GetFiles(branchRoot.path);
-            List<string> dllPlatformFilesUsable = new List<string>();// 存储过滤后的可用文件
+            List<string> dllPlatformFilesUsable = AssembliesUtility.GetDllFiles(branchRoot.path);// 存储过滤后的可用文件
 
             EditorGUILayout.BeginVertical();
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(16 * level);
-            branchRoot.foldout = EditorGUILayout.Foldout(branchRoot.foldout, branchRoot.name, true);
+            GUIContent fileGUI = new GUIContent(branchRoot.name, fileIconUnity);
+            branchRoot.foldout = EditorGUILayout.Foldout(branchRoot.foldout, fileGUI, true);
             EditorGUILayout.EndHorizontal();
 
             // 目录分支
@@ -214,19 +242,6 @@ namespace Framework.HybridCLRExpress
                     BranchTree(branch, level);
                 }
 
-                // 过滤文件
-                for (int i = 0; i < dllPlatformFiles.Length; i++)
-                {
-                    string file = dllPlatformFiles[i];
-                    string extension = Path.GetExtension(file);
-                    if (extension == ".dll")
-                    {
-                        // 转换文件分割格式
-                        file = file.Replace("\\", "/");
-
-                        dllPlatformFilesUsable.Add(file);
-                    }
-                }
                 // 非分支
                 var dlls = GetHotUpdateAssemblyFiles();
                 foreach (var dllFile in dllPlatformFilesUsable)

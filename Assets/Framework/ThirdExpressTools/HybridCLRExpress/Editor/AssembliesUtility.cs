@@ -61,7 +61,7 @@ namespace Framework.HybridCLRExpress
 
         public static AssembliesCfg GetAssembliesCfg()
         {
-           return GetAssembliesCfg(Application.dataPath);
+            return GetAssembliesCfg(Application.dataPath);
         }
         /// <summary>
         /// 获取 <see cref="AssembliesCfg"/> 配置
@@ -125,13 +125,15 @@ namespace Framework.HybridCLRExpress
         /// <param name="targetDir">要拷贝的目标目录</param>
         /// <param name="buildTarget">目标平台</param>
         /// <param name="addExtension">要为拷贝后的文件添加的扩展名</param>
-        public static void CopyHotUpdateAssembliesToDir(string targetDir, BuildTarget buildTarget, string addExtension)
+        public static void CopyHotUpdateAssembliesToDir(string targetDir, BuildTarget buildTarget, string addExtension, bool copyAll = false)
         {
             var target = buildTarget;
 
             string hotfixDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);// 获取对应平台的 DLL 生成目录
-            string hotfixAssembliesDstDir = targetDir;// 目标目录
-            string hotfixAssembliesPlatformDir = $"{hotfixAssembliesDstDir}/{target}";// 目标平台目录
+            string hotfixAssembliesDstDir = targetDir;// 要拷贝过去的目标目录
+            // 要拷贝过去的目标平台目录
+            //string hotfixAssembliesPlatformDir = $"{hotfixAssembliesDstDir}/{target}";
+            string hotfixAssembliesPlatformDir = $"{hotfixAssembliesDstDir}/{PlatformUtility.PlatformUntie(target)}";
 
             // 检查目录存在
             if (!Directory.Exists(hotfixAssembliesPlatformDir))
@@ -139,13 +141,22 @@ namespace Framework.HybridCLRExpress
                 Directory.CreateDirectory(hotfixAssembliesPlatformDir);
             }
 
-            foreach (var dll in SettingsUtil.HotUpdateAssemblyFilesExcludePreserved)
+            if (!copyAll)
             {
-                string dllPath = $"{hotfixDllSrcDir}/{dll}";
-                string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
-                string dllBytesPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";
-                File.Copy(dllPath, dllBytesPath, true);
-                Debug.Log($"[CopyHotUpdateAssembliesToDir] copy hotfix dll {dllPath} -> {dllBytesPath}");
+                // 只拷贝设置的 dll
+                foreach (var dll in SettingsUtil.HotUpdateAssemblyFilesExcludePreserved)
+                {
+                    string dllPath = $"{hotfixDllSrcDir}/{dll}";
+                    string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
+                    string dllBytesPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";
+                    File.Copy(dllPath, dllBytesPath, true);
+                    Debug.Log($"[CopyHotUpdateAssembliesToDir] 拷贝热更新 dll {dllPath} -> {dllBytesPath}");
+                }
+            }
+            else
+            {
+                string[] dllPlatformFiles = Directory.GetFiles(hotfixDllSrcDir, "*.dll");// 获取所有文件
+                List<string> dllPlatformFilesUsable = new List<string>();// 存储过滤后的可用文件
             }
         }
 
@@ -170,25 +181,29 @@ namespace Framework.HybridCLRExpress
         }
 
         /// <summary>
-        /// 获取所有平台的 DLL 文件
+        /// 获取 热更平台 目录下的 DLL 文件
         /// </summary>
         /// <returns></returns>
-        public static List<string> GetDllPlatformFiles()
+        public static List<string> GetDllFiles()
         {
-            string[] dllPlatformFiles = Directory.GetFiles(hotUpdateDLLDir);
+            return GetDllFiles(hotUpdateDLLDirCurPlatform);
+        }
+        /// <summary>
+        /// 获取目录下的 DLL 文件
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetDllFiles(string dir)
+        {
+            string[] dllPlatformFiles = Directory.GetFiles(dir, "*.dll");
             List<string> dllPlatformFilesUsable = new List<string>();// 存储过滤后的可用文件
             // 过滤文件
             for (int i = 0; i < dllPlatformFiles.Length; i++)
             {
                 string file = dllPlatformFiles[i];
-                string extension = Path.GetExtension(file);
-                if (extension == ".dll")
-                {
-                    // 转换文件分割格式
-                    file = file.Replace("\\", "/");
+                // 转换文件分割格式
+                file = file.Replace("\\", "/");
 
-                    dllPlatformFilesUsable.Add(file);
-                }
+                dllPlatformFilesUsable.Add(file);
             }
 
             return dllPlatformFilesUsable;

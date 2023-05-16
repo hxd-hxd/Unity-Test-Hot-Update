@@ -111,13 +111,13 @@ namespace Framework.HybridCLRExpress
         {
             CopyHotUpdateAssembliesToDir(Application.streamingAssetsPath, EditorUserBuildSettings.activeBuildTarget, "bytes");
         }
-        public static void CopyHotUpdateAssembliesToDir(string dir)
+        public static void CopyHotUpdateAssembliesToDir(string dir, bool copyAll = false)
         {
-            CopyHotUpdateAssembliesToDir(dir, "bytes");
+            CopyHotUpdateAssembliesToDir(dir, "bytes", copyAll);
         }
-        public static void CopyHotUpdateAssembliesToDir(string dir, string addExtension)
+        public static void CopyHotUpdateAssembliesToDir(string dir, string addExtension, bool copyAll = false)
         {
-            CopyHotUpdateAssembliesToDir(dir, EditorUserBuildSettings.activeBuildTarget, addExtension);
+            CopyHotUpdateAssembliesToDir(dir, EditorUserBuildSettings.activeBuildTarget, addExtension, copyAll);
         }
         /// <summary>
         /// 拷贝指定平台的 DLL 到指定的 Assets 目录下
@@ -141,22 +141,62 @@ namespace Framework.HybridCLRExpress
                 Directory.CreateDirectory(hotfixAssembliesPlatformDir);
             }
 
+            List<string> copyFiles = null;
+
+
             if (!copyAll)
             {
                 // 只拷贝设置的 dll
-                foreach (var dll in SettingsUtil.HotUpdateAssemblyFilesExcludePreserved)
-                {
-                    string dllPath = $"{hotfixDllSrcDir}/{dll}";
-                    string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
-                    string dllBytesPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";
-                    File.Copy(dllPath, dllBytesPath, true);
-                    Debug.Log($"[CopyHotUpdateAssembliesToDir] 拷贝热更新 dll {dllPath} -> {dllBytesPath}");
-                }
+                copyFiles = SettingsUtil.HotUpdateAssemblyFilesExcludePreserved;
+
+                //for (int i = 0; i < copyFiles.Count; i++)
+                //{
+                //    var dll = copyFiles[i];
+                //    string dllPath = $"{hotfixDllSrcDir}/{dll}";
+                //    copyFiles[i] = dllPath;
+                //}
             }
             else
             {
                 string[] dllPlatformFiles = Directory.GetFiles(hotfixDllSrcDir, "*.dll");// 获取所有文件
-                List<string> dllPlatformFilesUsable = new List<string>();// 存储过滤后的可用文件
+                //copyFiles = new List<string>(dllPlatformFiles);
+                copyFiles = dllPlatformFiles.Select(path => Path.GetFileName(path)).ToList();
+            }
+
+            foreach (var dll in copyFiles)
+            {
+                string dllPath = $"{hotfixDllSrcDir}/{dll}";
+                string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
+                string dllBytesPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";
+                File.Copy(dllPath, dllBytesPath, true);
+                Debug.Log($"[CopyHotUpdateAssembliesToDir] 拷贝热更新 dll {dllPath} -> {dllBytesPath}");
+            }
+        }
+
+        /// <summary>
+        /// 拷贝所有平台的 DLL 到指定的 Assets 目录下
+        /// </summary>
+        /// <param name="targetDir">要拷贝的目标目录</param>
+        public static void CopyAllHotUpdateAssembliesToDir(string targetDir, bool copyAll = false)
+        {
+            CopyAllHotUpdateAssembliesToDir(targetDir, "bytes", copyAll);
+        }
+        /// <summary>
+        /// 拷贝所有平台的 DLL 到指定的 Assets 目录下
+        /// </summary>
+        /// <param name="targetDir">要拷贝的目标目录</param>
+        /// <param name="addExtension">要为拷贝后的文件添加的扩展名</param>
+        public static void CopyAllHotUpdateAssembliesToDir(string targetDir, string addExtension, bool copyAll = false)
+        {
+            string[] dirs = Directory.GetDirectories(hotUpdateDLLDir);// 获取热更dll生成目录
+
+            foreach (var item in dirs)
+            {
+                string paltform = Path.GetFileName(item);
+                if (Enum.TryParse(paltform, out BuildTarget target))
+                {
+                    CopyHotUpdateAssembliesToDir(targetDir, target, addExtension, copyAll);
+                }
             }
         }
 

@@ -12,10 +12,13 @@ using UnityEditor;
 using HybridCLR.Editor;
 using System.Linq;
 
+using FGUIUtility = Framework.Editor.GUIUtility;
+
 namespace Framework.HybridCLRExpress
 {
 
     using static AssembliesUtility;
+    using static Codice.Client.Common.Connection.AskCredentialsToUser;
 
 
     /// <summary>
@@ -163,7 +166,7 @@ namespace Framework.HybridCLRExpress
             copyAllDll = EditorGUILayout.Toggle("拷贝所有 DLL", copyAllDll);
             if (GUILayout.Button("拷贝当前平台 DLL", whiteButtonStyle))
             {
-                AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath);
+                AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath, copyAllDll);
 
                 AssetDatabase.Refresh();
             }
@@ -223,8 +226,59 @@ namespace Framework.HybridCLRExpress
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(16 * level);
-            GUIContent fileGUI = new GUIContent(branchRoot.name, fileIconUnity);
-            branchRoot.foldout = EditorGUILayout.Foldout(branchRoot.foldout, fileGUI, true);
+            GUIContent folderGUI = null;
+            //fileGUI = new GUIContent(branchRoot.name, fileIconUnity);
+
+            bool folderEmpty = dllPlatformDirs.Length <= 0 && dllPlatformFilesUsable.Count <= 0;
+            var dlls = GetHotUpdateAssemblyFiles();
+            if (branchRoot.IsVacancyBranch)
+            {
+                folderGUI = FGUIUtility.IconNew.FolderEmptyOn;
+            }
+            else
+            {
+                //if (branchRoot.name == "StandaloneWindows64")
+                //{
+                //    Debug.Log("");
+                //}
+
+                // 筛分h
+                if (!showAllDll)
+                    foreach (var dllFile in dllPlatformFilesUsable)
+                    {
+                        if (dlls.Contains(dllFile))
+                        {
+                            folderEmpty = false;
+                            break;
+                        }
+                            folderEmpty = true;
+                    }
+
+                if (folderEmpty)
+                {
+                    folderGUI = FGUIUtility.IconNew.FolderEmptyOn;
+                }
+                else
+                {
+                    if (branchRoot.foldout) folderGUI = FGUIUtility.IconNew.FolderOpened;
+                    else folderGUI = FGUIUtility.IconNew.Folder;
+                }
+            }
+            folderGUI.tooltip = null;
+            folderGUI.text = branchRoot.name;
+
+            //Debug.Log($"检查 {branchRoot.name}  文件夹：{dllPlatformDirs.Length}  可用文件：{dllPlatformFilesUsable.Count}  是否空显示：{folderEmpty}");
+
+            if (folderEmpty)
+            {
+                EditorGUILayout.LabelField(folderGUI);
+            }
+            else
+            {
+                //branchRoot.foldout = EditorGUILayout.Foldout(branchRoot.foldout, folderGUI, true);
+                branchRoot.foldout = EditorGUILayout.BeginFoldoutHeaderGroup(branchRoot.foldout, folderGUI);
+            }
+            EditorGUILayout.EndFoldoutHeaderGroup();
             EditorGUILayout.EndHorizontal();
 
             // 目录分支
@@ -243,7 +297,6 @@ namespace Framework.HybridCLRExpress
                 }
 
                 // 非分支
-                var dlls = GetHotUpdateAssemblyFiles();
                 foreach (var dllFile in dllPlatformFilesUsable)
                 {
                     Action dllShowItem = () =>
@@ -255,7 +308,11 @@ namespace Framework.HybridCLRExpress
                         branch.path = dllFile;
                         branch.isBranch = false;
                         branch.foldout = false;
-                        EditorGUILayout.LabelField(branch.name);
+                        GUIContent gui = FGUIUtility.IconNew.AssemblyDefinitionAsset;
+                        gui.tooltip = null;
+                        gui.text = branch.name;
+                        //gui.text += branch.name;
+                        EditorGUILayout.LabelField(gui);
                         EditorGUILayout.EndHorizontal();
                     };
 
@@ -427,6 +484,20 @@ namespace Framework.HybridCLRExpress
                     return null;
                 }
                 //set => subBranchDic[id.ToString()] = value;
+            }
+            /// <summary>
+            /// 是否空分支
+            /// </summary>
+            public bool IsVacancyBranch
+            {
+                get
+                {
+                    if (isBranch)
+                    {
+                        return subBranchDic.Count < 0;
+                    }
+                    return true;
+                }
             }
 
             #region 构造

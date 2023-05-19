@@ -172,6 +172,7 @@ namespace Framework.HybridCLRExpress
             }
             if (GUILayout.Button("拷贝所有平台 DLL", whiteButtonStyle))
             {
+                AssembliesUtility.CopyAllHotUpdateAssembliesToDir(copyPath, copyAllDll);
 
                 AssetDatabase.Refresh();
             }
@@ -310,7 +311,8 @@ namespace Framework.HybridCLRExpress
                         branch.foldout = false;
                         GUIContent gui = FGUIUtility.IconNew.AssemblyDefinitionAsset;
                         gui.tooltip = null;
-                        gui.text = branch.name;
+                        gui.text = branch.name 
+                        + (dlls.Contains(dllFile) ? "  (已配置)" : null);
                         //gui.text += branch.name;
                         EditorGUILayout.LabelField(gui);
                         EditorGUILayout.EndHorizontal();

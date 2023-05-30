@@ -13,6 +13,7 @@ using System.Linq;
 
 using System.Text;
 using System.Text.RegularExpressions;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Framework.HybridCLRExpress
 {
@@ -74,7 +75,6 @@ namespace Framework.HybridCLRExpress
 
             if (Directory.Exists(path))
             {
-                string[] dirs = Directory.GetDirectories(path);
                 string[] files = Directory.GetFiles(path, "*.asset");
 
                 foreach (string file in files)
@@ -92,6 +92,7 @@ namespace Framework.HybridCLRExpress
                 }
                 if (!l_cfg)
                 {
+                    string[] dirs = Directory.GetDirectories(path);
                     foreach (string dir in dirs)
                     {
                         l_cfg = GetAssembliesCfg(dir);
@@ -128,6 +129,7 @@ namespace Framework.HybridCLRExpress
         public static void CopyHotUpdateAssembliesToDir(string targetDir, BuildTarget buildTarget, string addExtension, bool copyAll = false)
         {
             var target = buildTarget;
+            bool isCurrentPlatform = target == EditorUserBuildSettings.activeBuildTarget;   // 指定的目标平台是否当前的平台
 
             string hotfixDllSrcDir = SettingsUtil.GetHotUpdateDllsOutputDirByTarget(target);// 获取对应平台的 DLL 生成目录
             string hotfixAssembliesDstDir = targetDir;// 要拷贝过去的目标目录
@@ -169,8 +171,10 @@ namespace Framework.HybridCLRExpress
                 string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
                 string dllBytesPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";
                 File.Copy(dllPath, dllBytesPath, true);
-                Debug.Log($"[CopyHotUpdateAssembliesToDir] 拷贝热更新 dll {dllPath} -> {dllBytesPath}");
+                Debug.Log($"[CopyHotUpdateAssembliesToDir] 拷贝热更新 dll \r\n{dllPath} -> {dllBytesPath}");
+
             }
+
         }
 
         /// <summary>
@@ -199,6 +203,50 @@ namespace Framework.HybridCLRExpress
                 }
             }
         }
+
+        /// <summary>
+        /// 拷贝到使用目录
+        /// </summary>
+        public static void CopyToUseDir()
+        {
+            CopyToUseDir("bytes");
+        }
+        /// <summary>
+        /// 拷贝到使用目录
+        /// </summary>
+        public static void CopyToUseDir(string addExtension)
+        {
+            Debug.Log("----------------------拷贝到使用目录----------------------");
+
+            var target = EditorUserBuildSettings.activeBuildTarget;   // 当前的平台
+
+            // 目标平台目录
+            //string hotfixAssembliesPlatformDir = $"{hotfixAssembliesDstDir}/{target}";
+            string hotfixAssembliesPlatformDir = $"{cfg.copyPath}/{PlatformUtility.PlatformUntie(target)}";
+            // 获取所有 dll 文件
+            string[] dllPlatformFiles = Directory.GetFiles(hotfixAssembliesPlatformDir, $"*.{addExtension}");
+
+            // 创建当前使用的目录
+            if (!Directory.Exists(cfg.currentUsePath)) Directory.CreateDirectory(cfg.currentUsePath);
+            // 只拷贝设置的 dll
+            List<string> copyFiles = SettingsUtil.HotUpdateAssemblyFilesExcludePreserved;
+
+            // 拷贝文件到当前使用的目录
+            //foreach (var dll in dllPlatformFiles)
+            //{
+
+            //}
+            foreach (var dll in copyFiles)
+            {
+                string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
+                string dllPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";// 源文件
+                string dllTargetPath = $"{cfg.currentUsePath}/{dll}{extension}";// 目标文件
+                File.Copy(dllPath, dllTargetPath, true);
+                Debug.Log($"[{nameof(CopyToUseDir)}] 拷贝热更新 dll \r\n{dllPath} -> {dllTargetPath}");
+
+            }
+        }
+
 
         /// <summary>
         /// 获取要热更新的 DLL 文件

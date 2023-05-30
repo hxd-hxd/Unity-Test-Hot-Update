@@ -18,10 +18,10 @@ MonoBehaviour:
   ShowEditorAlias: 1
   Packages:
   - PackageName: DefaultPackage
-    PackageDesc: 
+    PackageDesc: "\u9ED8\u8BA4\u7684\u8D44\u6E90\u5305"
     Groups:
     - GroupName: scenes
-      GroupDesc: 
+      GroupDesc: "\u573A\u666F\u6587\u4EF6"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -34,7 +34,7 @@ MonoBehaviour:
         AssetTags: 
         UserData: 
     - GroupName: ugui
-      GroupDesc: 
+      GroupDesc: "UI \u754C\u9762\u7B49"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -55,7 +55,7 @@ MonoBehaviour:
         AssetTags: 
         UserData: 
     - GroupName: shader
-      GroupDesc: 
+      GroupDesc: "\u6240\u6709\u7740\u8272\u5668"
       AssetTags: 
       ActiveRuleName: EnableGroup
       Collectors:
@@ -65,6 +65,19 @@ MonoBehaviour:
         AddressRuleName: AddressByFileName
         PackRuleName: PackShaderVariants
         FilterRuleName: CollectShaderVariants
+        AssetTags: 
+        UserData: 
+    - GroupName: dlls
+      GroupDesc: "\u70ED\u66F4\u65B0\u7A0B\u5E8F\u96C6\u8D44\u6E90"
+      AssetTags: 
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/HotUpdateAssemblies/Use
+        CollectorGUID: 28762a75f88c03440a9ba358ce30e928
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackDirectory
+        FilterRuleName: CollectAll
         AssetTags: 
         UserData: 
   - PackageName: SelectivityPackage

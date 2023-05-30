@@ -15,7 +15,7 @@ using UnityEditor;
 namespace Framework.Editor
 {
     /// <summary>
-    /// Unity GUI
+    /// Unity GUI 图标
     /// </summary>
     public static class GUIUtility
     {
@@ -171,7 +171,7 @@ namespace Framework.Editor
         /// <returns></returns>
         public static GUIContent GetUnityIcon(string name)
         {
-            GUIContent icon = unityIconDic[name];
+            GUIContent icon = null;
             if (unityIconDic.ContainsKey(name))
             {
                 icon = unityIconDic[name];
@@ -209,6 +209,9 @@ namespace Framework.Editor
 
         public static void Clear()
         {
+            //_unityIcons.Clear();
+            //_unityIconDic.Clear();
+
             _unityIcons = null;
             _unityIconDic = null;
         }

@@ -40,8 +40,10 @@ namespace Framework.HybridCLRExpress
 
         // 拷贝
         bool copyAllDll = false;        // 拷贝所有 DLL
+        bool autoCopyUseDll = true;     // 自动拷贝 DLL 到使用目录
         bool copyCurPlatformDll = true; // 拷贝当前平台 DLL
         string copyPath { get => AssembliesUtility.cfg.copyPath; set => AssembliesUtility.cfg.copyPath = value; }
+        string currentUsePathName { get => AssembliesUtility.cfg.currentUsePathName; set => AssembliesUtility.cfg.currentUsePathName = value; }
         //string copyPath = "Assets/HotUpdateAssemblies";
 
         GUIStyle whiteStyle = new GUIStyle();
@@ -160,19 +162,31 @@ namespace Framework.HybridCLRExpress
             GUILayout.Space(8);
 
             // 拷贝
-            copyPath = GUILayout.TextArea(copyPath, GUILayout.MinHeight(48));
+            GUILayout.Label("热更新程序集作为资源存放的路径");
+            copyPath = GUILayout.TextArea(copyPath, GUILayout.MinHeight(32));
+            GUILayout.Label("当前要使用的 dll 存放的路径名");
+            currentUsePathName = EditorGUILayout.TextField(currentUsePathName);
             //AssembliesUtility.cfg.copyPath = copyPath;
             //copyCurPlatformDll = EditorGUILayout.ToggleLeft("拷贝当前平台 DLL", copyCurPlatformDll);
             copyAllDll = EditorGUILayout.Toggle("拷贝所有 DLL", copyAllDll);
+            autoCopyUseDll = EditorGUILayout.Toggle("自动拷贝 DLL 到使用目录", autoCopyUseDll);
             if (GUILayout.Button("拷贝当前平台 DLL", whiteButtonStyle))
             {
                 AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath, copyAllDll);
+                if(autoCopyUseDll) AssembliesUtility.CopyToUseDir();
 
                 AssetDatabase.Refresh();
             }
             if (GUILayout.Button("拷贝所有平台 DLL", whiteButtonStyle))
             {
                 AssembliesUtility.CopyAllHotUpdateAssembliesToDir(copyPath, copyAllDll);
+                if (autoCopyUseDll) AssembliesUtility.CopyToUseDir();
+
+                AssetDatabase.Refresh();
+            }
+            if (GUILayout.Button("拷贝当前平台 DLL 到使用目录", whiteButtonStyle))
+            {
+                AssembliesUtility.CopyToUseDir();
 
                 AssetDatabase.Refresh();
             }
@@ -220,18 +234,18 @@ namespace Framework.HybridCLRExpress
         // 显示树状结构分支
         public void BranchTree(FlatFoldoutBranch branchRoot, int level = 0)
         {
-            string[] dllPlatformDirs = Directory.GetDirectories(branchRoot.path);
-            List<string> dllPlatformFilesUsable = AssembliesUtility.GetDllFiles(branchRoot.path);// 存储过滤后的可用文件
+            string[] dllPlatformDirs = Directory.GetDirectories(branchRoot.path);// 获取所有子目录
+            List<string> dllPlatformFilesUsable = AssembliesUtility.GetDllFiles(branchRoot.path);// 获取过滤后的 dll 文件
 
             EditorGUILayout.BeginVertical();
 
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Space(16 * level);
+            GUILayout.Space(16 * level);// 计算前方空隙
             GUIContent folderGUI = null;
             //fileGUI = new GUIContent(branchRoot.name, fileIconUnity);
 
             bool folderEmpty = dllPlatformDirs.Length <= 0 && dllPlatformFilesUsable.Count <= 0;
-            var dlls = GetHotUpdateAssemblyFiles();
+            var dlls = GetHotUpdateAssemblyFiles();// 热更的 dll 文件
             if (branchRoot.IsVacancyBranch)
             {
                 folderGUI = FGUIUtility.IconNew.FolderEmptyOn;
@@ -243,7 +257,8 @@ namespace Framework.HybridCLRExpress
                 //    Debug.Log("");
                 //}
 
-                // 筛分h
+                // 筛分
+                // 检查是否包含热更新文件，以判断是否显示为空文件夹
                 if (!showAllDll)
                     foreach (var dllFile in dllPlatformFilesUsable)
                     {
@@ -257,12 +272,12 @@ namespace Framework.HybridCLRExpress
 
                 if (folderEmpty)
                 {
-                    folderGUI = FGUIUtility.IconNew.FolderEmptyOn;
+                    folderGUI = FGUIUtility.IconNew.FolderEmptyOn;// 空文件夹
                 }
                 else
                 {
-                    if (branchRoot.foldout) folderGUI = FGUIUtility.IconNew.FolderOpened;
-                    else folderGUI = FGUIUtility.IconNew.Folder;
+                    if (branchRoot.foldout) folderGUI = FGUIUtility.IconNew.FolderOpened;   // 展开
+                    else folderGUI = FGUIUtility.IconNew.Folder;                            // 折叠
                 }
             }
             folderGUI.tooltip = null;
@@ -309,7 +324,7 @@ namespace Framework.HybridCLRExpress
                         branch.path = dllFile;
                         branch.isBranch = false;
                         branch.foldout = false;
-                        GUIContent gui = FGUIUtility.IconNew.AssemblyDefinitionAsset;
+                        GUIContent gui = FGUIUtility.IconNew.AssemblyDefinitionAsset;// 程序集图标
                         gui.tooltip = null;
                         gui.text = branch.name 
                         + (dlls.Contains(dllFile) ? "  (已配置)" : null);

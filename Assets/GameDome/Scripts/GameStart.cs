@@ -48,7 +48,7 @@ namespace Test.TestYooAsset
 
 
         /// <summary>
-        /// 包裹的版本信息
+        /// 资源包的版本信息
         /// </summary>
         public string PackageVersion { set; get; }
 

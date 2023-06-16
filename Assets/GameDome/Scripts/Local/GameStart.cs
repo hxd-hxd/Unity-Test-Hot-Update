@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using Framework;
 using Framework.YooAssetExpress;
 using global::YooAsset;
 
-namespace Test.TestYooAsset
+namespace Test 
 {
     public class GameStart : MonoBehaviour
     {
@@ -72,7 +72,7 @@ namespace Test.TestYooAsset
         // 初始化资源包
         private IEnumerator InitPackage()
         {
-            yield return new WaitForSeconds(1);
+            //yield return new WaitForSeconds(1);
 
             EPlayMode _playMode = PlayMode;
 
@@ -142,7 +142,7 @@ namespace Test.TestYooAsset
         // 获取资源更新版本
         private IEnumerator GetStaticVersion()
         {
-            yield return new WaitForSecondsRealtime(0.5f);
+            //yield return new WaitForSecondsRealtime(0.5f);
 
             AssetsPackage package = YooAssets.GetAssetsPackage(packageName);
             UpdatePackageVersionOperation operation = package.UpdatePackageVersionAsync();
@@ -166,7 +166,7 @@ namespace Test.TestYooAsset
         // 更新资源清单！
         private IEnumerator UpdateManifest()
         {
-            yield return new WaitForSecondsRealtime(0.5f);
+            //yield return new WaitForSecondsRealtime(0.5f);
 
             var package = YooAssets.GetAssetsPackage(packageName);
             var operation = package.UpdatePackageManifestAsync(PackageVersion);
@@ -189,7 +189,7 @@ namespace Test.TestYooAsset
         // 创建补丁下载器！
         IEnumerator CreateDownloader()
         {
-            yield return new WaitForSecondsRealtime(0.5f);
+            //yield return new WaitForSecondsRealtime(0.5f);
 
             tryDownloadNum++;
 
@@ -283,15 +283,70 @@ namespace Test.TestYooAsset
         private void Operation_Completed(AsyncOperationBase obj)
         {
             Debug.Log("更新完毕");
+
+            //LoadDLL.LoadMetadataForAOTAssemblies();
+            // 加载程序集
+#if !UNITY_EDITOR
+            LoadDllFunc();
+#endif
+
             Debug.Log("开始游戏");
 
 
             // 跳转场景
+            Debug.Log("开始加载场景 ---》Login《--- ");
             SceneOperationHandle sceneOperation = YooAssets.LoadSceneAsync("Login");
-
+            sceneOperation.Completed += (_) =>
+            {
+                Debug.Log($"加载场景 ---》{sceneOperation.SceneObject.name}《--- 成功");
+            };
         }
 
         #endregion
+
+        /// <summary>
+        ///  加载 dll 程序集
+        /// </summary>
+        private void LoadDllFunc()
+        {
+            LoadDllFunc("Assembly-CSharp.dll");
+            //LoadDllFunc("Assets/HotUpdateAssemblies/Use/Assembly-CSharp.dll.bytes");
+        }
+        /// <summary>
+        ///  加载 dll 程序集
+        /// </summary>
+        private void LoadDllFunc(string location)
+        {
+            if (!islog) return;
+            islog = false;
+
+            Log.Yellow("开始加载 dll 程序集");
+
+            var aoh = YooAssets.LoadAssetSync<TextAsset>(location);
+
+            Debug.Log($"处理器：{aoh}，{location}");
+            //Debug.Log($"Address：{aoh.GetAssetInfo().Address}，AssetPath：{aoh.GetAssetInfo().AssetPath}，AssetType：{aoh.GetAssetInfo().AssetType}，");
+
+            TextAsset csDll = aoh?.GetAssetObject<TextAsset>();
+
+            Debug.Log($"文本资源：{csDll != null}，{location}");
+
+            byte[] dllDatas = csDll?.bytes;
+
+            //Debug.Log($"资源元数据：{dllDatas}，大小：{dllDatas.Length}，{location}");
+
+            if (dllDatas != null)
+            {
+                Debug.Log($"开始加载程序集 ---》{location}《---");
+                System.Reflection.Assembly.Load(dllDatas);
+                Log.Striking($"加载程序集 ---》{location}《--- 完毕");
+            }
+            else
+            {
+                Log.Error($"不存在程序集 ---》{location}《---");
+            }
+        }
+        bool islog = true;
 
 
         // 转换成 MB 显示值

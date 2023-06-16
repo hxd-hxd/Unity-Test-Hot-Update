@@ -24,7 +24,8 @@ internal class AndroidPost : UnityEditor.Android.IPostGenerateGradleAndroidProje
 			"           e.printStackTrace();\n" +
 			"        }finally{\n" +
 			"            try {\n" +
-			"               inputStream.close();\n" +
+            "               if(null != inputStream)\n" +// 我添加的一行
+			"					inputStream.close();\n" +
 			"           } catch (java.io.IOException e) {\n" +
 			"               e.printStackTrace();\n" +
 			"           }\n" +

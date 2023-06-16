@@ -32,14 +32,14 @@ namespace Framework
 
         void Start()
         {
-            Debug.Log($"屏幕分辨率：{Screen.width} x {Screen.height}");
+            //Debug.Log($"屏幕分辨率：{Screen.width} x {Screen.height}");
             width = Screen.width;
             height = Screen.height;
         }
 
         void Update()
         {
-            Debug.Log($"屏幕分辨率：{Screen.width} x {Screen.height}");
+            //Debug.Log($"屏幕分辨率：{Screen.width} x {Screen.height}");
             width = Screen.width;
             height = Screen.height;
 

@@ -153,7 +153,17 @@ namespace Framework.Editor
             Texture2D[] textures = Resources.FindObjectsOfTypeAll<Texture2D>();
             foreach (Texture2D texture in textures)
             {
-                GUIContent icon = EditorGUIUtility.IconContent(texture.name, $"|{texture.name}");
+                GUIContent icon = null;
+                try
+                {
+                    icon = EditorGUIUtility.IconContent(texture.name, $"|{texture.name}");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    //throw;
+                }
+
                 if (icon != null && icon.image != null)
                 {
                     //icon.text = texture.name;

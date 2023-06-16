@@ -1,0 +1,8 @@
+<linker>
+	<assembly fullname="Framework.Local" preserve="all" />
+	<assembly fullname="Framework.Local.YooAssetExpress" preserve="all" />
+	
+	<assembly fullname="GameLocal" preserve="all" />
+	
+	<assembly fullname="StreamingAssetsHelper" preserve="all" />
+</linker>

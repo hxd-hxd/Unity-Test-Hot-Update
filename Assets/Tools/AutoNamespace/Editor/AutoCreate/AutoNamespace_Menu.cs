@@ -1,6 +1,6 @@
 // -------------------------
 // 由工具自动创建，请勿手动修改
-// 创建日期：2023/5/15 18:42:05
+// 创建日期：2023/6/2 0:01:16
 // -------------------------
 
 #pragma warning disable 0414
@@ -75,6 +75,58 @@ namespace AutoNamespace
         // 本方法用于控制菜单按钮 Framework.HybridCLRExpress 的启用
         [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Framework.HybridCLRExpress", true, 1000)]
         private static bool NamespaceMenuEnable_Framework_HybridCLRExpress()
+        {
+            return AutoNamespaceUtility.Enable();
+        }
+        
+
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Framework.GameFrameworkExpress", false, 1000)]
+        private static void NamespaceMenu_Framework_GameFrameworkExpress()
+        {
+            AutoNamespaceUtility.CreateCSharpScriptAsset("Framework.GameFrameworkExpress");
+        }
+        // 本方法用于控制菜单按钮 Framework.GameFrameworkExpress 的启用
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Framework.GameFrameworkExpress", true, 1000)]
+        private static bool NamespaceMenuEnable_Framework_GameFrameworkExpress()
+        {
+            return AutoNamespaceUtility.Enable();
+        }
+        
+
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Test.TestYooAsset", false, 1000)]
+        private static void NamespaceMenu_Test_TestYooAsset()
+        {
+            AutoNamespaceUtility.CreateCSharpScriptAsset("Test.TestYooAsset");
+        }
+        // 本方法用于控制菜单按钮 Test.TestYooAsset 的启用
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/Test.TestYooAsset", true, 1000)]
+        private static bool NamespaceMenuEnable_Test_TestYooAsset()
+        {
+            return AutoNamespaceUtility.Enable();
+        }
+        
+
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/GameFramework", false, 1000)]
+        private static void NamespaceMenu_GameFramework()
+        {
+            AutoNamespaceUtility.CreateCSharpScriptAsset("GameFramework");
+        }
+        // 本方法用于控制菜单按钮 GameFramework 的启用
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/GameFramework", true, 1000)]
+        private static bool NamespaceMenuEnable_GameFramework()
+        {
+            return AutoNamespaceUtility.Enable();
+        }
+        
+
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/GameFramework.Runtime", false, 1000)]
+        private static void NamespaceMenu_GameFramework_Runtime()
+        {
+            AutoNamespaceUtility.CreateCSharpScriptAsset("GameFramework.Runtime");
+        }
+        // 本方法用于控制菜单按钮 GameFramework.Runtime 的启用
+        [MenuItem(Constant.Menu.MenuAutoNamespacePath + "/GameFramework.Runtime", true, 1000)]
+        private static bool NamespaceMenuEnable_GameFramework_Runtime()
         {
             return AutoNamespaceUtility.Enable();
         }

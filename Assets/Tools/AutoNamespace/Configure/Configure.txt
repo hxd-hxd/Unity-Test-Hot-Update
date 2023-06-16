@@ -17,6 +17,10 @@
         "TestMenu",
         "Framework",
         "Framework.Editor",
-        "Framework.HybridCLRExpress"
+        "Framework.HybridCLRExpress",
+        "Framework.GameFrameworkExpress",
+        "Test.TestYooAsset",
+        "GameFramework",
+        "GameFramework.Runtime"
     ]
 }

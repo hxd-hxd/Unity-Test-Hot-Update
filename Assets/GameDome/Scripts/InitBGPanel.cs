@@ -1,4 +1,4 @@
-// -------------------------
+﻿// -------------------------
 // 创建日期：2023/2/24 15:30:19
 // -------------------------
 
@@ -12,7 +12,7 @@ using UnityEngine.UI;
 using YooAsset;
 using Framework;
 
-namespace Test.TestYooAsset
+namespace Test
 {
     [ExecuteInEditMode]
     public class InitBGPanel : MonoBehaviour
@@ -46,11 +46,15 @@ namespace Test.TestYooAsset
 
                 //};
             });
+
+            transform.FindOf<Text>("HotUpdateText").text = "2";
+
+            Log.Striking(TestHotUpdate.name);
         }
 
         private void Update()
         {
-            screenInfo.text = $"{Screen.width} x {Screen.height}";
+            //screenInfo.text = $"{Screen.width} x {Screen.height}";
         }
     }
 

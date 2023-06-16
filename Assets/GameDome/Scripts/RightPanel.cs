@@ -11,7 +11,7 @@ using UnityEngine;
 using Framework;
 using UnityEngine.UI;
 
-namespace Test.TestYooAsset
+namespace Test 
 {
     public class RightPanel : MonoBehaviour
     {

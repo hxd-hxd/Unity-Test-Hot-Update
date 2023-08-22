@@ -3,6 +3,7 @@
 对 YooAsset 资源热更插件的扩展。
 
 注意：请在导入此扩展之前导入 YooAsset 插件，不然会报错。
+	本工具编写时对应插件版本为 1.4.8
 
 Github 仓库：https://github.com/tuyoogame/YooAsset/tree/main
 

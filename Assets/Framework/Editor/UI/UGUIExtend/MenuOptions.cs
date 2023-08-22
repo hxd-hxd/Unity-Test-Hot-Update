@@ -9,44 +9,46 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEditor;
-using UnityEditor.Experimental;
 using Object = UnityEngine.Object;
 
 namespace Framework.Editor
 {
     public class MenuOptions
     {
+        // 创建下拉菜单
         [MenuItem("GameObject/UI/Dropdown Pro - Text", priority = 2036)]
         static void AddDropdown(MenuCommand menuCommand)
         {
-            var go = CreateUI.Create(CreateUI.FullRootPath, "DropdownPro Text.prefab");
+            var go = CreateUI.Create("DropdownPro Text.prefab");
             Selection.activeGameObject = go;
         }
 
+        #region 测试
+
         //[MenuItem("GameObject/UI/TestSphere", priority = 2036)]
-        //static void TestSphere(MenuCommand menuCommand)
-        //{
-        //    Object obj = Selection.objects.Length > 0 ? Selection.objects[0] : null;
+        static void TestSphere(MenuCommand menuCommand)
+        {
+            Object obj = Selection.objects.Length > 0 ? Selection.objects[0] : null;
 
-        //    //var dpPrefab = EditorResources.Load<GameObject>($"{RootPath}DropdownPro Text");
-        //    //var dpPrefab = EditorGUIUtility.Load($"Sphere.prefab");
-        //    var dpPrefab = EditorGUIUtility.Load($"Sphere");
-        //    //var dpPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{FullRootPath}DropdownPro Text.prefab");
-        //    var dp = (GameObject)Object.Instantiate(dpPrefab);
+            //var dpPrefab = EditorResources.Load<GameObject>($"{RootPath}DropdownPro Text");
+            //var dpPrefab = EditorGUIUtility.Load($"Sphere.prefab");
+            var dpPrefab = EditorGUIUtility.Load($"Sphere");
+            //var dpPrefab = AssetDatabase.LoadAssetAtPath<GameObject>($"{FullRootPath}DropdownPro Text.prefab");
+            var dp = (GameObject)Object.Instantiate(dpPrefab);
 
-        //    if (obj == null)
-        //    {
+            if (obj == null)
+            {
 
-        //    }
-        //    else
-        //    {
-        //        if (obj is GameObject go)
-        //        {
-        //            dp.transform.SetParent(go.transform, false);
-        //        }
-        //    }
+            }
+            else
+            {
+                if (obj is GameObject go)
+                {
+                    dp.transform.SetParent(go.transform, false);
+                }
+            }
 
-        //}
+        }
 
         //[MenuItem("Examples/Load Editor Texture Example")]
         static void loadExample()
@@ -107,6 +109,8 @@ namespace Framework.Editor
             mesh.triangles = triangles;
             mesh.Optimize();
             mesh.RecalculateNormals();
-        }
+        } 
+
+        #endregion
     }
 }

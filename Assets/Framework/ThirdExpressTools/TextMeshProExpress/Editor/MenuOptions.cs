@@ -17,7 +17,7 @@ namespace Framework.TextMeshProExpress
         [MenuItem("GameObject/UI/Dropdown Pro - TMP Text", priority = 2036)]
         static void AddDropdown(MenuCommand menuCommand)
         {
-            var go = CreateUI.Create("Assets/Framework/ThirdExpressTools/TextMeshProExpress/Prefabs/", "DropdownPro TMP.prefab");
+            CreateUI.Create("Assets/Framework/ThirdExpressTools/TextMeshProExpress/Prefabs/", "DropdownPro TMP.prefab");
         }
     }
 }

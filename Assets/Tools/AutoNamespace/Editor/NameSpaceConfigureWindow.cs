@@ -34,9 +34,11 @@ namespace AutoNamespace
         [SerializeField]
         NamespaceConfig nc;
 
+        Vector2 sv;
+
         int explainMaxWidth = 140;
 
-        static bool pathFoldoutHeaderGroup = true;
+        static bool pathFoldoutHeaderGroup = false;
         static float pathFadeGroupOver = 1;
         static float pathFadeGroup = 1;
         float currentVelocity = 0;
@@ -66,6 +68,8 @@ namespace AutoNamespace
 
         private void OnGUI()
         {
+            sv = EditorGUILayout.BeginScrollView(sv);
+
             // 地址配置信息
             //EditorGUI.BeginChangeCheck();
             //{
@@ -201,6 +205,8 @@ namespace AutoNamespace
 
                 AssetDatabase.Refresh();
             }
+
+            EditorGUILayout.EndScrollView();
         }
 
         // 检查命名空间配置列表是否允许修改

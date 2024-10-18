@@ -71,3 +71,6 @@ namespace Framework.HybridCLRExpress
 #endif
     }
 }
+
+#pragma warning restore 0414
+#pragma warning restore 0219

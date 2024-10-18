@@ -28,14 +28,6 @@ namespace Framework.Editor
     /// </summary>
     public class GUIIconViewer : EditorWindow
 	{
-	    // 滑动条
-	    Vector2 sv = Vector2.zero;
-	    // 搜索
-	    private string search = "";
-	    private int currentNum;// 当前数量
-	    // 图标
-	    private List<GUIContent> icons;
-	
 	    /*
 	    * 这里的菜单路径自行修改
 	    */
@@ -47,10 +39,18 @@ namespace Framework.Editor
 	
 	    }
 	
+	    // 滑动条
+	    Vector2 sv = Vector2.zero;
+	    // 搜索
+	    private string search = "";
+	    private int currentNum;// 当前数量
+	    // 图标
+	    private List<GUIContent> icons;
+	
 	    // 窗口打开时调用
 	    private void OnEnable()
 	    {
-			icons = GUIUtility.GetUnityIcons();
+			icons = GUIUtilityExtend.GetUnityIcons();
             //icons.OrderBy(p => p.tooltip.Substring(0, 1)).GroupBy(p => p.tooltip.Substring(0, 1)).ToList();
         }
 	

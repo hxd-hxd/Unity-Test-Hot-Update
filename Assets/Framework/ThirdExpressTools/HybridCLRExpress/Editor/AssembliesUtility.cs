@@ -13,7 +13,6 @@ using System.Linq;
 
 using System.Text;
 using System.Text.RegularExpressions;
-using static UnityEngine.GraphicsBuffer;
 
 namespace Framework.HybridCLRExpress
 {
@@ -205,7 +204,7 @@ namespace Framework.HybridCLRExpress
         }
 
         /// <summary>
-        /// 拷贝到使用目录
+        /// 拷贝到使用目录，默认拷贝“bytes”文件
         /// </summary>
         public static void CopyToUseDir()
         {
@@ -213,6 +212,7 @@ namespace Framework.HybridCLRExpress
         }
         /// <summary>
         /// 拷贝到使用目录
+        /// <para><paramref name="addExtension"/>：扩展名，例："txt"</para>
         /// </summary>
         public static void CopyToUseDir(string addExtension)
         {
@@ -223,24 +223,22 @@ namespace Framework.HybridCLRExpress
             // 目标平台目录
             //string hotfixAssembliesPlatformDir = $"{hotfixAssembliesDstDir}/{target}";
             string hotfixAssembliesPlatformDir = $"{cfg.copyPath}/{PlatformUtility.PlatformUntie(target)}";
-            // 获取所有 dll 文件
-            string[] dllPlatformFiles = Directory.GetFiles(hotfixAssembliesPlatformDir, $"*.{addExtension}");
 
             // 创建当前使用的目录
             if (!Directory.Exists(cfg.currentUsePath)) Directory.CreateDirectory(cfg.currentUsePath);
             // 只拷贝设置的 dll
             List<string> copyFiles = SettingsUtil.HotUpdateAssemblyFilesExcludePreserved;
 
-            // 拷贝文件到当前使用的目录
-            //foreach (var dll in dllPlatformFiles)
-            //{
-
-            //}
             foreach (var dll in copyFiles)
             {
                 string extension = string.IsNullOrEmpty(addExtension) ? null : $".{addExtension}";// 扩展名
                 string dllPath = $"{hotfixAssembliesPlatformDir}/{dll}{extension}";// 源文件
                 string dllTargetPath = $"{cfg.currentUsePath}/{dll}{extension}";// 目标文件
+                if (!File.Exists(dllPath))
+                {
+                    Debug.LogError($"文件不存在：\"{dllPath}\"");
+                    continue;
+                }
                 File.Copy(dllPath, dllTargetPath, true);
                 Debug.Log($"[{nameof(CopyToUseDir)}] 拷贝热更新 dll \r\n{dllPath} -> {dllTargetPath}");
 

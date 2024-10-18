@@ -10,16 +10,19 @@ using UnityEngine;
 
 using UnityEditor;
 using HybridCLR.Editor;
+using HybridCLR.Editor.Settings;
 using System.Linq;
 
-using FGUIUtility = Framework.Editor.GUIUtility;
+using FGUIUtility = Framework.Editor.GUIUtilityExtend;
+using UnityEditor.Compilation;
+
+#pragma warning disable IDE0051 // 删除未使用的私有成员
+#pragma warning disable IDE0044 // 添加只读修饰符
+#pragma warning disable 0414
 
 namespace Framework.HybridCLRExpress
 {
-
     using static AssembliesUtility;
-    using static Codice.Client.Common.Connection.AskCredentialsToUser;
-
 
     /// <summary>
     /// 处理由 HybridCLR 生成的程序集
@@ -34,7 +37,8 @@ namespace Framework.HybridCLRExpress
         }
 
         FlatFoldoutBranch rootFoldout;
-        bool showAllDll = false;
+        bool showAllDll = false;// 显示所有平台 dll
+        bool onlyShowCurrentPlatformDll = true;// 只显示当前平台 dll
         Vector2 rootFoldoutSV = Vector2.zero;
         Vector2 fullSV = Vector2.zero;
 
@@ -44,11 +48,59 @@ namespace Framework.HybridCLRExpress
         bool copyCurPlatformDll = true; // 拷贝当前平台 DLL
         string copyPath { get => AssembliesUtility.cfg.copyPath; set => AssembliesUtility.cfg.copyPath = value; }
         string currentUsePathName { get => AssembliesUtility.cfg.currentUsePathName; set => AssembliesUtility.cfg.currentUsePathName = value; }
-        //string copyPath = "Assets/HotUpdateAssemblies";
+        //string copyPath = "Assets/HotUpdateAssemblies"; 
 
+        // HybridCLR 设置
+        private SerializedObject _HybridCLR_SO;
+        private SerializedProperty _HybridCLR_OS;
+
+
+        GUIStyle _labelStyle;
         GUIStyle whiteStyle = new GUIStyle();
-        GUIStyle whiteButtonStyle = new GUIStyle();
-        GUIStyle yellowButtonStyle = new GUIStyle();
+        GUIStyle _whiteButtonStyle;
+        GUIStyle _yellowButtonStyle;
+
+        GUIStyle labelStyle
+        {
+            get
+            {
+                GUIStyle v = _labelStyle;
+                if (v == null)
+                {
+                    v = new GUIStyle(EditorStyles.whiteLabel);
+                    v.richText = true;
+                }
+                return _labelStyle = v;
+            }
+        }
+        GUIStyle whiteButtonStyle
+        {
+            get
+            {
+                GUIStyle v = _whiteButtonStyle;
+                if (v == null)
+                {
+                    v = new GUIStyle(EditorStyles.miniButton);
+                    v.normal.textColor = Color.white;
+                    v.fontSize = 14;
+                    v.stretchHeight = true;
+                    v.fixedHeight = 32;
+                }
+                return _whiteButtonStyle = v;
+            }
+        }
+        GUIStyle yellowButtonStyle
+        {
+            get
+            {
+                GUIStyle v = _yellowButtonStyle;
+                if (v == null)
+                {
+                    v = new GUIStyle(whiteButtonStyle);
+                }
+                return _yellowButtonStyle = v;
+            }
+        }
 
         private void OnEnable()
         {
@@ -56,21 +108,16 @@ namespace Framework.HybridCLRExpress
 
             rootFoldout = new FlatFoldoutBranch(dir);
             rootFoldout.path = dir;
+            //foreach (var b in rootFoldout.subBranchDic)
+            //{
+            //    rootFoldout.Expect(b.Key).foldout = b.Value.name == EditorUserBuildSettings.activeBuildTarget.ToString();
+            //}
 
             // 样式
             whiteStyle.normal.textColor = Color.white;
             whiteStyle.fontSize = 14;
 
-            if (EditorStyles.miniButton != null)
-                whiteButtonStyle = EditorStyles.miniButton.CloneSelf();
-            whiteButtonStyle.normal.textColor = Color.white;
-            whiteButtonStyle.fontSize = 14;
-            whiteButtonStyle.stretchHeight = true;
-            whiteButtonStyle.fixedHeight = 32;
-
-            yellowButtonStyle = whiteButtonStyle.CloneSelf();
-
-            //var cfg = AssembliesUtility.cfg;
+            //var cfg = AssembliesUtility.cfg; 
         }
 
         private void OnGUI()
@@ -170,14 +217,14 @@ namespace Framework.HybridCLRExpress
             //copyCurPlatformDll = EditorGUILayout.ToggleLeft("拷贝当前平台 DLL", copyCurPlatformDll);
             copyAllDll = EditorGUILayout.Toggle("拷贝所有 DLL", copyAllDll);
             autoCopyUseDll = EditorGUILayout.Toggle("自动拷贝 DLL 到使用目录", autoCopyUseDll);
-            if (GUILayout.Button("拷贝当前平台 DLL", whiteButtonStyle))
+            if (GUILayout.Button("拷贝 当前 平台 DLL", whiteButtonStyle))
             {
                 AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath, copyAllDll);
-                if(autoCopyUseDll) AssembliesUtility.CopyToUseDir();
+                if (autoCopyUseDll) AssembliesUtility.CopyToUseDir();
 
                 AssetDatabase.Refresh();
             }
-            if (GUILayout.Button("拷贝所有平台 DLL", whiteButtonStyle))
+            if (GUILayout.Button("拷贝 所有 平台 DLL", whiteButtonStyle))
             {
                 AssembliesUtility.CopyAllHotUpdateAssembliesToDir(copyPath, copyAllDll);
                 if (autoCopyUseDll) AssembliesUtility.CopyToUseDir();
@@ -260,6 +307,7 @@ namespace Framework.HybridCLRExpress
                 // 筛分
                 // 检查是否包含热更新文件，以判断是否显示为空文件夹
                 if (!showAllDll)
+                {
                     foreach (var dllFile in dllPlatformFilesUsable)
                     {
                         if (dlls.Contains(dllFile))
@@ -267,8 +315,9 @@ namespace Framework.HybridCLRExpress
                             folderEmpty = false;
                             break;
                         }
-                            folderEmpty = true;
+                        folderEmpty = true;
                     }
+                }
 
                 if (folderEmpty)
                 {
@@ -315,31 +364,62 @@ namespace Framework.HybridCLRExpress
                 // 非分支
                 foreach (var dllFile in dllPlatformFilesUsable)
                 {
+                    string fileName = Path.GetFileName(dllFile);
+                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+
+                    bool hotUpdate = dlls.Contains(dllFile);
+
                     Action dllShowItem = () =>
                     {
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(16 * level);
-                        string fileName = Path.GetFileName(dllFile);
+
+                        //var assemblys = CompilationPipeline.GetAssemblies();
+                        // 获取程序集定义文件路径
+                        string asmdefPath = CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(fileName);
+                        bool isAsmdef = !string.IsNullOrEmpty(asmdefPath);
+
                         var branch = branchRoot.Expect(fileName);
                         branch.path = dllFile;
                         branch.isBranch = false;
                         branch.foldout = false;
                         GUIContent gui = FGUIUtility.IconNew.AssemblyDefinitionAsset;// 程序集图标
-                        gui.tooltip = null;
-                        gui.text = branch.name 
-                        + (dlls.Contains(dllFile) ? "  (已配置)" : null);
+                        gui.tooltip = dllFile;
+                        gui.text = branch.name
+                        + (hotUpdate ? "  <color=green>(已配置热更新)</color>" : null);
                         //gui.text += branch.name;
-                        EditorGUILayout.LabelField(gui);
+                        EditorGUILayout.LabelField(gui, labelStyle);
+
+                        // 更改 HybridCLR 热更新程序集设置
+                        EditorGUI.BeginChangeCheck();
+                        bool t = EditorGUILayout.Toggle(hotUpdate, GUILayout.MaxWidth(16));
+                        //HybridCLRSettings
+                        //HybridCLRSettingsProvider
+                        // 需要区分是 dll 文件还是 untiy 的程序集定义文件
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            // 添加到热更新
+                            if (t)
+                            {
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
+
                         EditorGUILayout.EndHorizontal();
                     };
 
+                    //dllShowItem();
                     if (showAllDll)
                     {
                         dllShowItem();
                     }
                     else
                     {
-                        if (dlls.Contains(dllFile)) dllShowItem();
+                        if (hotUpdate) dllShowItem();
                     }
                 }
             }
@@ -534,7 +614,7 @@ namespace Framework.HybridCLRExpress
             protected Branch(int id)
             {
                 _id = id;
-                name = id.ToString();
+                _name = id.ToString();
             }
 
             protected Branch(string name, int id)
@@ -610,3 +690,7 @@ namespace Framework.HybridCLRExpress
         #endregion
     }
 }
+
+#pragma warning restore IDE0044 // 添加只读修饰符
+#pragma warning restore IDE0051 // 删除未使用的私有成员
+#pragma warning restore 0414

@@ -17,27 +17,27 @@ namespace Framework.YooAssetExpress
     /// </summary>
     public static class Express
     {
-        /// <summary>
-        /// 计算场景加载时刷新的进度条
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="minProgressTime">最小的进度持续时间（不会小于真实进度）</param>
-        /// <param name="progressAcion">更新进度时的回调</param>
-        /// <param name="progressFinish">更新进度完成的回调</param>
-        /// <returns></returns>
-        public static IEnumerator Progress(this SceneOperationHandle operation, float minProgressTime, Action<float> progressAcion, Action progressFinish)
-        {
+        ///// <summary>
+        ///// 计算场景加载时刷新的进度条
+        ///// </summary>
+        ///// <param name="operation"></param>
+        ///// <param name="minProgressTime">最小的进度持续时间（不会小于真实进度）</param>
+        ///// <param name="progressAcion">更新进度时的回调</param>
+        ///// <param name="progressFinish">更新进度完成的回调</param>
+        ///// <returns></returns>
+        //public static IEnumerator Progress(this SceneOperationHandle operation, float minProgressTime, Action<float> progressAcion, Action progressFinish)
+        //{
 
-            //yield return ExtendUtility.Progress(() =>
-            yield return Progress(() =>
-            {
-                return operation.Progress;
-            },
-            minProgressTime,
-            progressAcion,
-            progressFinish);
+        //    //yield return ExtendUtility.Progress(() =>
+        //    yield return Progress(() =>
+        //    {
+        //        return operation.Progress;
+        //    },
+        //    minProgressTime,
+        //    progressAcion,
+        //    progressFinish);
 
-        }
+        //}
 
         /// <summary>
         /// 计算场景加载时刷新的进度条

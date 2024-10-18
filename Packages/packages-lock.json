@@ -1,31 +1,38 @@
 {
   "dependencies": {
-    "com.focus-creative-games.hybridclr_unity": {
+    "com.code-philosophy.hybridclr": {
       "version": "https://gitee.com/focus-creative-games/hybridclr_unity.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "a9ca9fc6131b81cd3d4c48adcd871434475539c1"
+      "hash": "64a6d26fa33466c864de9cb0ed90481873cd6250"
     },
     "com.tuyoogame.yooasset": {
-      "version": "1.4.8",
+      "version": "2.2.4-preview",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.scriptablebuildpipeline": "1.20.2",
+        "com.unity.scriptablebuildpipeline": "2.1.3",
         "com.unity.modules.assetbundle": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0",
         "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
       },
-      "url": "https://package.openupm.cn"
+      "url": "https://package.openupm.com"
     },
-    "com.unity.collab-proxy": {
-      "version": "1.15.15",
+    "com.unity.ai.navigation": {
+      "version": "1.1.5",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.services.core": "1.0.1"
+        "com.unity.modules.ai": "1.0.0"
       },
+      "url": "https://packages.unity.cn"
+    },
+    "com.unity.collab-proxy": {
+      "version": "2.4.4",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
       "url": "https://packages.unity.cn"
     },
     "com.unity.ext.nunit": {
@@ -36,16 +43,16 @@
       "url": "https://packages.unity.cn"
     },
     "com.unity.ide.rider": {
-      "version": "2.0.7",
+      "version": "3.0.31",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.test-framework": "1.1.1"
+        "com.unity.ext.nunit": "1.0.6"
       },
       "url": "https://packages.unity.cn"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.14",
+      "version": "2.0.22",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -61,23 +68,14 @@
       "url": "https://packages.unity.cn"
     },
     "com.unity.scriptablebuildpipeline": {
-      "version": "1.20.2",
+      "version": "2.1.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.cn"
     },
-    "com.unity.services.core": {
-      "version": "1.0.1",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.modules.unitywebrequest": "1.0.0"
-      },
-      "url": "https://packages.unity.cn"
-    },
     "com.unity.test-framework": {
-      "version": "1.1.31",
+      "version": "1.1.33",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -97,7 +95,7 @@
       "url": "https://packages.unity.cn"
     },
     "com.unity.timeline": {
-      "version": "1.4.8",
+      "version": "1.7.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -146,19 +144,6 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
-    },
-    "com.unity.modules.autostreaming": {
-      "version": "1.0.0",
-      "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.assetbundle": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
-      }
     },
     "com.unity.modules.cloth": {
       "version": "1.0.0",
@@ -261,17 +246,6 @@
     "com.unity.modules.uielements": {
       "version": "1.0.0",
       "depth": 0,
-      "source": "builtin",
-      "dependencies": {
-        "com.unity.modules.ui": "1.0.0",
-        "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.uielementsnative": "1.0.0"
-      }
-    },
-    "com.unity.modules.uielementsnative": {
-      "version": "1.0.0",
-      "depth": 1,
       "source": "builtin",
       "dependencies": {
         "com.unity.modules.ui": "1.0.0",

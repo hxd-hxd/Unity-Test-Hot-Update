@@ -8,7 +8,7 @@ using Framework;
 using Framework.YooAssetExpress;
 using global::YooAsset;
 
-namespace Test 
+namespace Test
 {
     public class GameStart : MonoBehaviour
     {
@@ -46,6 +46,7 @@ namespace Test
         [Header("尝试下载次数")]
         [SerializeField] private int tryDownloadNum = 0;
 
+        EDefaultBuildPipeline buildPipeline = EDefaultBuildPipeline.BuiltinBuildPipeline;
 
         /// <summary>
         /// 资源包的版本信息
@@ -55,7 +56,7 @@ namespace Test
         /// <summary>
         /// 下载器
         /// </summary>
-        public PatchDownloaderOperation Downloader { set; get; }
+        public ResourceDownloaderOperation Downloader { set; get; }
 
 
         void Start()
@@ -79,12 +80,12 @@ namespace Test
             Debug.Log("------------------------------------创建默认的资源包------------------------------------");
 
             // 创建默认的资源包
-            AssetsPackage package = YooAssets.TryGetAssetsPackage(packageName);
+            var package = YooAssets.TryGetPackage(packageName);
             if (package == null)
             {
                 // 没有则创建
-                package = YooAssets.CreateAssetsPackage(packageName);
-                YooAssets.SetDefaultAssetsPackage(package);
+                package = YooAssets.CreatePackage(packageName);
+                YooAssets.SetDefaultPackage(package);
             }
 
             InitializationOperation initializationOperation = null;
@@ -93,8 +94,9 @@ namespace Test
                 // 编辑器下的模拟模式
                 case EPlayMode.EditorSimulateMode:
                     {
+                        var simulateBuildResult = EditorSimulateModeHelper.SimulateBuild(buildPipeline, packageName);
                         var createParameters = new EditorSimulateModeParameters();
-                        createParameters.SimulatePatchManifestPath = EditorSimulateModeHelper.SimulateBuild(packageName);
+                        createParameters.EditorFileSystemParameters = FileSystemParameters.CreateDefaultEditorFileSystemParameters(simulateBuildResult);
                         initializationOperation = package.InitializeAsync(createParameters);
                     }
                     break;
@@ -102,8 +104,8 @@ namespace Test
                 // 单机运行模式
                 case EPlayMode.OfflinePlayMode:
                     {
-                        OfflinePlayModeParameters createParameters = new OfflinePlayModeParameters();
-                        createParameters.DecryptionServices = new GameDecryptionServices();
+                        var createParameters = new OfflinePlayModeParameters();
+                        createParameters.BuildinFileSystemParameters = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
                         initializationOperation = package.InitializeAsync(createParameters);
                     }
                     break;
@@ -111,11 +113,20 @@ namespace Test
                 // 联机运行模式
                 case EPlayMode.HostPlayMode:
                     {
-                        HostPlayModeParameters createParameters = new HostPlayModeParameters();
-                        createParameters.DecryptionServices = new GameDecryptionServices();
-                        createParameters.QueryServices = new GameQueryServices();
-                        createParameters.DefaultHostServer = GetHostServerURL();
-                        createParameters.FallbackHostServer = GetHostServerURL();
+                        string defaultHostServer = GetHostServerURL();
+                        string fallbackHostServer = GetHostServerURL();
+                        IRemoteServices remoteServices = new RemoteServices(defaultHostServer, fallbackHostServer);
+                        var createParameters = new HostPlayModeParameters();
+                        createParameters.BuildinFileSystemParameters = FileSystemParameters.CreateDefaultBuildinFileSystemParameters();
+                        createParameters.CacheFileSystemParameters = FileSystemParameters.CreateDefaultCacheFileSystemParameters(remoteServices);
+                        initializationOperation = package.InitializeAsync(createParameters);
+                    }
+                    break;
+                // WebGL运行模式
+                case EPlayMode.WebPlayMode:
+                    {
+                        var createParameters = new WebPlayModeParameters();
+                        createParameters.WebFileSystemParameters = FileSystemParameters.CreateDefaultWebFileSystemParameters();
                         initializationOperation = package.InitializeAsync(createParameters);
                     }
                     break;
@@ -128,74 +139,81 @@ namespace Test
             // 初始化成功开始更新版本
             if (package.InitializeStatus == EOperationStatus.Succeed)
             {
-                Debug.Log("------------------------------------获取最新的资源版本 !------------------------------------");
-
                 yield return GetStaticVersion();
             }
             else
             {
-                Debug.Log("创建默认的资源包失败");
-                Debug.LogWarning($"{initializationOperation.Error}");
+                Debug.LogError($"创建默认的资源包失败：{initializationOperation.Error}");
+
+                // 尝试再次初始化
+                yield return InitPackage();
             }
         }
 
         // 获取资源更新版本
         private IEnumerator GetStaticVersion()
         {
+            Debug.Log("------------------------------------获取最新的资源版本 !------------------------------------");
+
             //yield return new WaitForSecondsRealtime(0.5f);
 
-            AssetsPackage package = YooAssets.GetAssetsPackage(packageName);
-            UpdatePackageVersionOperation operation = package.UpdatePackageVersionAsync();
+            var package = YooAssets.GetPackage(packageName);
+            var operation = package.RequestPackageVersionAsync();
             yield return operation;
 
             if (operation.Status == EOperationStatus.Succeed)
             {
                 PackageVersion = operation.PackageVersion;
 
-                Debug.Log("------------------------------------更新资源清单！------------------------------------");
-
                 yield return UpdateManifest();
             }
             else
             {
-                Debug.LogWarning("获取资源更新版本失败");
-                Debug.LogWarning(operation.Error);
+                Debug.LogError($"获取资源更新版本失败：{operation.Error}");
+
+                // 用户尝试再次更新静态版本
+                yield return GetStaticVersion();
             }
         }
 
         // 更新资源清单！
         private IEnumerator UpdateManifest()
         {
+            Debug.Log("------------------------------------更新资源清单！------------------------------------");
+
             //yield return new WaitForSecondsRealtime(0.5f);
 
-            var package = YooAssets.GetAssetsPackage(packageName);
+            var package = YooAssets.GetPackage(packageName);
             var operation = package.UpdatePackageManifestAsync(PackageVersion);
             yield return operation;
 
-
             if (operation.Status == EOperationStatus.Succeed)
             {
-                Debug.Log("------------------------------------创建补丁下载器！------------------------------------");
-
                 yield return CreateDownloader();
             }
             else
             {
-                Debug.LogWarning("创建补丁下载器失败");
-                Debug.LogWarning(operation.Error);
+                Debug.LogError($"创建补丁下载器失败：{operation.Error}");
+
+                // 用户尝试再次更新更新补丁清单
+                yield return UpdateManifest();
             }
         }
 
         // 创建补丁下载器！
-        IEnumerator CreateDownloader()
+        private IEnumerator CreateDownloader()
         {
+            Debug.Log("------------------------------------创建补丁下载器！------------------------------------");
+
             //yield return new WaitForSecondsRealtime(0.5f);
 
             tryDownloadNum++;
 
             int downloadingMaxNum = 10;
-            int faileTryAgain = 3;
-            Downloader = YooAssets.CreatePatchDownloader(downloadingMaxNum, faileTryAgain);
+            int failedTryAgain = 3;
+            Downloader = YooAssets.CreateResourceDownloader(downloadingMaxNum, failedTryAgain);
+            //var package = YooAssets.GetPackage(packageName);
+            //Downloader = package.CreateResourceDownloader(downloadingMaxNum, failedTryAgain);
 
             if (Downloader.TotalDownloadCount == 0)
             {
@@ -274,8 +292,8 @@ namespace Test
         {
             Debug.Log("清理未使用的缓存文件");
 
-            var package = YooAssets.GetAssetsPackage(packageName);
-            var operation = package.ClearUnusedCacheFilesAsync();
+            var package = YooAssets.GetPackage(packageName);
+            var operation = package.ClearUnusedBundleFilesAsync();
             operation.Completed += Operation_Completed;
         }
 
@@ -292,10 +310,9 @@ namespace Test
 
             Debug.Log("开始游戏");
 
-
             // 跳转场景
             Debug.Log("开始加载场景 ---》Login《--- ");
-            SceneOperationHandle sceneOperation = YooAssets.LoadSceneAsync("Login");
+            var sceneOperation = YooAssets.LoadSceneAsync("Login");
             sceneOperation.Completed += (_) =>
             {
                 Debug.Log($"加载场景 ---》{sceneOperation.SceneObject.name}《--- 成功");
@@ -331,7 +348,7 @@ namespace Test
 
             Debug.Log($"文本资源：{csDll != null}，{location}");
 
-            byte[] dllDatas = csDll?.bytes;
+            byte[] dllDatas = csDll ? csDll.bytes : null;
 
             //Debug.Log($"资源元数据：{dllDatas}，大小：{dllDatas.Length}，{location}");
 
@@ -388,43 +405,5 @@ namespace Test
             return $"{hostServerIP}/{resPath}/{PlatformUtility.platform}/{gameVersion}";
         }
 
-        /// <summary>
-        /// 内置文件查询服务类
-        /// </summary>
-        public class GameQueryServices : IQueryServices
-        {
-            public bool QueryStreamingAssets(string fileName)
-            {
-                string buildinFolderName = YooAssets.GetStreamingAssetBuildinFolderName();
-                return StreamingAssetsHelper.FileExists($"{buildinFolderName}/{fileName}");
-            }
-        }
-
-        /// <summary>
-        /// 资源文件解密服务类
-        /// </summary>
-        private class GameDecryptionServices : IDecryptionServices
-        {
-            public ulong LoadFromFileOffset(DecryptFileInfo fileInfo)
-            {
-                return 32;
-            }
-
-            public byte[] LoadFromMemory(DecryptFileInfo fileInfo)
-            {
-                throw new NotImplementedException();
-            }
-
-            public Stream LoadFromStream(DecryptFileInfo fileInfo)
-            {
-                BundleStream bundleStream = new BundleStream(fileInfo.FilePath, FileMode.Open);
-                return bundleStream;
-            }
-
-            public uint GetManagedReadBufferSize()
-            {
-                return 1024;
-            }
-        }
     }
 }

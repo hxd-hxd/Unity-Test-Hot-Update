@@ -8,7 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static UnityEngine.Networking.UnityWebRequest;
 
 namespace Framework
 {
@@ -71,8 +70,7 @@ namespace Framework
                     }
                     catch (Exception e)
                     {
-                        Log.Error("事件穿透引发的异常");
-                        Log.Error(e);
+                        Log.Error($"事件穿透引发的异常。{e}");
                         //throw;
                     }
                     break;

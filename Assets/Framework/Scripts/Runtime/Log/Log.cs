@@ -37,11 +37,11 @@ namespace Framework
 
         public static void Client(object msg)
         {
-            Debug.Log($"[Client]{msg}");
+            Debug.Log($"Client：{msg}");
         }
         public static void Server(object msg)
         {
-            Debug.Log($"[Server]{msg}");
+            Debug.Log($"Server：{msg}");
         }
 
 
@@ -51,11 +51,11 @@ namespace Framework
         }
         public static void Client(object msg, string color)
         {
-            Debug.Log($"<color={color}>[Client]{msg}</color>");
+            Debug.Log($"<color={color}>Client：{msg}</color>");
         }
         public static void Server(object msg, string color)
         {
-            Debug.Log($"<color={color}>[Server]{msg}</color>");
+            Debug.Log($"<color={color}>Server：{msg}</color>");
         }
 
 
@@ -93,7 +93,7 @@ namespace Framework
                     Debuger(msg, "#32FF00");
                     break;
                 case LogMode.NoIncur:
-                    Debuger($"[Striking]{msg}", "#32FF00");
+                    Debuger($"Striking：\t{msg}", "#32FF00");
                     break;
                 default:
                     break;
@@ -121,7 +121,7 @@ namespace Framework
                     break;
                 case LogMode.NoIncur:
                     //Debuger($"Warning：\r\n\t{msg}", "yellow");
-                    Debuger($"[Warning]{msg}", "#FDB30B");
+                    Debuger($"Warning：\t{msg}", "#FDB30B");
                     break;
                 default:
                     break;
@@ -161,7 +161,7 @@ namespace Framework
         /// <param name="msg"></param>
         public static void ErrorNoIncur(object msg)
         {
-            Debug.LogFormat("<color=red>[Error]{0}</color>", msg);
+            Debug.LogFormat("<color=red>Error：\t{0}</color>", msg);
         }
     }
 }

@@ -14,10 +14,10 @@ namespace Framework
     /// <summary>
     /// UI 界面基类
     /// </summary>
-    public abstract class BaseUIPanel : MonoBehaviour
+    public abstract class BaseUIPanel : BaseUI
     {
         [Tooltip("是否初始化")]
-        [SerializeField] protected bool m_init;
+        [SerializeField] protected bool _isInit;
 
         [Tooltip("所属画布")]
         [SerializeField] protected Canvas _canvas;
@@ -29,7 +29,7 @@ namespace Framework
         [Tooltip("常驻界面")]
         [SerializeField] protected bool permanent = false;
         [Tooltip("此界面是否启用")]
-        [SerializeField] protected bool isEnable = true;
+        [SerializeField] protected bool _isEnable = true;
         [Tooltip("是否阻挡其他射线")]
         [SerializeField] protected bool isResistRay = true;
         [Tooltip("界面排序等级。界面排序考虑到各种情况较为复杂，如遇到此选项影响不到或有问题的界面，请考虑调整界面使用策略。")]
@@ -39,21 +39,18 @@ namespace Framework
         public Action OnDisableEvent;
         public Action OnDestroyEvent;
 
-        // 是否执行过初始化？
-        protected bool isInited { get; set; } = false;
-
         /// <summary>
         /// 是否初始化
         /// </summary>
-        public bool init
+        public bool isInit
         {
             get
             {
-                return m_init;
+                return _isInit;
             }
             protected set
             {
-                m_init= value;
+                _isInit= value;
             }
         }
         /// <summary>
@@ -75,16 +72,16 @@ namespace Framework
         /// 此界面是否启用
         /// <para>ps：此设置只是一个额外的标识，不会真的影响界面的启用，启用界面请使用 <see cref="Enable(bool)"/></para>
         /// </summary>
-        public virtual bool IsEnable
+        public override bool isEnable
         {
             get
             {
                 if(gameObject==null) return false;
-                return gameObject.activeInHierarchy && isEnable;
+                return gameObject.activeInHierarchy && _isEnable;
             }
             set
             {
-                isEnable = value;
+                _isEnable = value;
             }
         }
         /// <summary>
@@ -93,13 +90,13 @@ namespace Framework
         public bool Permanent { get => permanent; set => permanent = value; }
         /// <summary>
         /// 是否阻挡其他射线
-        /// <para>注意：获取时同时启用 <see cref="IsEnable"/> 才有效</para>
+        /// <para>注意：获取时同时启用 <see cref="isEnable"/> 才有效</para>
         /// </summary>
         public virtual bool IsResistRay
         {
             get
             {
-                return isResistRay && IsEnable;
+                return isResistRay && isEnable;
             }
             set
             {
@@ -109,9 +106,9 @@ namespace Framework
 
         /// <summary>
         /// 界面排序等级
-        /// <para>注意：会影响到 <see cref="UIPanelManager.PanelTopmost(BaseUIPanel, bool, bool)"/> 的排序策略</para>
-        /// <para>界面排序考虑到各种情况较为复杂，如遇到此选项影响不到或有问题的界面，请考虑调整界面使用策略</para>
-        /// <para>默认最会在同级、低级中排序</para>
+        /// <para>注意：会影响到 <see cref="UIPanelManager.PanelTopmost(BaseUIPanel, bool, bool)"/> 的排序策略。</para>
+        /// <para>界面排序考虑到各种情况较为复杂，如遇到此选项影响不到或有问题的界面，请考虑调整界面使用策略。</para>
+        /// <para>默认最会在同级、低级中排序。</para>
         /// </summary>
         public virtual int SortOrderLevel
         {
@@ -125,20 +122,25 @@ namespace Framework
             }
         }
 
-        protected virtual void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             UIPanelManager.Register(this);
 
         }
 
-        protected virtual void Start()
+        protected override void Start()
         {
+            base.Start();
             //Debug.Log($"{this} Start");
 
         }
 
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+
             //Debug.Log($"{this} OnEnable");
             UIPanelManager.GetCanvas(this);
 
@@ -153,13 +155,16 @@ namespace Framework
 
         }
 
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            UIPanelManager.RemovePanel(this);
+
             OnDestroyEvent?.Invoke();
 
         }
 
-        protected virtual void OnDisable()
+        protected override void OnDisable()
         {
             OnDisableEvent?.Invoke();
 
@@ -169,68 +174,43 @@ namespace Framework
         /// 初始化界面
         /// </summary>
         ///// <returns>成功初始化返回 true，已经初始化或初始化失败返回 false</returns>
-        public virtual void Init()
+        public override void Init()
         {
-            if (init)
+            if (isInit)
             {
                 return;
             }
             
-            init = true;
+            isInit = true;
         }
 
-        /// <summary>
-        /// 启用界面
-        /// <para>ps：已启用则禁用，反之亦然</para>
-        /// </summary>
-        public virtual void Enable()
-        {
-            Enable(!gameObject.activeSelf);
-        }
+        ///// <summary>
+        ///// 启用界面
+        ///// <para>ps：已启用则禁用，反之亦然</para>
+        ///// </summary>
+        //public virtual void Enable()
+        //{
+        //    Enable(!gameObject.activeSelf);
+        //}
         /// <summary>
         /// 启用界面
         /// </summary>
         /// <param name="enable"></param>
-        public virtual void Enable(bool enable)
+        public override void Enable(bool enable)
         {
             if (gameObject.activeSelf == enable) return;
 
             gameObject.SetActive(enable);
 
         }
-        /// <summary>
-        /// 打开面板
-        /// </summary>
-        public virtual void OnShow()
-        { }
-        /// <summary>
-        /// 打开面板
-        /// </summary>
-        public virtual void OnShow<T>(T info)
-        { }
-        public virtual void OnShow<T>(T info, T infos)
-        { }
-        public virtual void OnShow<T>(T info,T infos,T infoss)
-        { }
-        public virtual void OnShow(Dictionary<string,object> info)
-        { }
-        public virtual void OnShow(Dictionary<string, object> info, UnityAction action)
-        { }
-        public virtual void OnShow(Dictionary<string, object> info, UnityAction action,UnityAction unityAction)
-        { }
+
         /// <summary>
         /// 销毁界面
         /// </summary>
-        public virtual void Destroy()
+        public override void Destroy()
         {
+            base.Destroy();
             this.DestroyPanel();
-        }
-        /// <summary>
-        /// 隱藏面板
-        /// </summary>
-        public virtual void OnHide()
-        {
-            OnEnable();
         }
 
     }

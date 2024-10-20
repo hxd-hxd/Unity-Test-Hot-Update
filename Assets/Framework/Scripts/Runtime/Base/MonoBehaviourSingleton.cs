@@ -16,12 +16,12 @@
                | | \\\ 9 /// | |
              | \_| ''\-8-/'' |_/ |
               \ .-\__ `0` ___/-. /
-           ___`. .' /--2--\ `. .' __
+           ___`. .' /--2--\ `. .'___
         ."" '< `.___\_<0>_/___.` >' "".
-      | | : `- \`.;`\ 2 /`;.`/ - ` : | |
-        \ \ `-. \_ __\ /__ _/ .-` / /
-======`-.____`-.___\_____/___.-`____.-'======
-                   `=---='
+       | | : `- \`.;`\ 2 /`;.`/ -` : | |
+         \ \ `-. \_ __\ /__ _/ .-` / /
+=======`-.____`-.___\_____/___.-`____.-'=======
+                   ‘=---='
  
  */
 
@@ -70,7 +70,7 @@ namespace Framework
         /// <summary>
         /// 是否自动实例化
         /// </summary>
-        public static bool autoInstance = false;
+        public static bool autoInstance = true;
 
         static void InitAutoInstance()
         {
@@ -106,7 +106,10 @@ namespace Framework
                 return;
             }
 
-            instance = (T)(Component)this;
+            instance = this as T;
+
+            if (transform.root == transform)
+                DontDestroyOnLoad(gameObject);
         }
 
     }

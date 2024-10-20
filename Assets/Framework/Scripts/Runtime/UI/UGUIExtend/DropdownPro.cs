@@ -32,14 +32,8 @@ namespace Framework
         where Text : MaskableGraphic
         //TMP_Text , UnityEngine.UI.Text
     {
-        [Space(16)]
-        [Tooltip("选中时关闭菜单")]
-        [SerializeField] protected bool m_SelectedCloseMenu = true;
-        [Tooltip("定位时要显示的位置比例（一般在 0 - 1）")]
-        [SerializeField] protected float m_LocateProportion = 0.3f;
-
         // 已有
-        [Space(8)]
+        [Space(16)]
         [Tooltip("菜单列表模板")]
         [SerializeField] protected RectTransform m_Template;
         [Tooltip("当前显示的文本")]
@@ -88,6 +82,35 @@ namespace Framework
         /// </summary>
         public event Action<bool> MenuEnableEvent;
 
+        #region 优化
+
+        [Header("清除时保留的选项上限")]
+        [Header("优化设置")]
+        [Space]
+        [SerializeField] protected int itemReserveMax = 100;// 保留的选项上限，清除时
+
+        protected Sectionalizer m_Precreator = new Sectionalizer();
+        protected Sectionalizer m_Precleaner = new Sectionalizer();
+
+        /// <summary>
+        /// 预创建器
+        /// </summary>
+        protected Sectionalizer precreator
+        {
+            get { return m_Precreator; }
+        }
+        /// <summary>
+        /// 预清除器
+        /// </summary>
+        protected Sectionalizer precleaner
+        {
+            get { return m_Precleaner; }
+        }
+
+        public int ItemReserveMax { get => itemReserveMax; set => itemReserveMax = value; }
+
+        #endregion
+
 
         /// <summary>
         /// 根 Canvas 
@@ -96,7 +119,7 @@ namespace Framework
         {
             get
             {
-                return targetGraphic?.canvas;
+                return targetGraphic.canvas;
             }
         }
 
@@ -151,27 +174,18 @@ namespace Framework
         }
 
         /// <summary>
-        /// 选中时关闭菜单
-        /// </summary>
-        public bool SelectedCloseMenu { get => m_SelectedCloseMenu; set => m_SelectedCloseMenu = value; }
-        /// <summary>
-        /// 定位时要显示的位置比例（一般在 0 - 1）
-        /// </summary>
-        public float LocateProportion { get => m_LocateProportion; set => m_LocateProportion = value; }
-
-        /// <summary>
         /// 选项模板
         /// </summary>
-        public GameObject ItemTemplate { get { return m_Item; } set => m_Item = value; }
+        public GameObject ItemTemplate { get { return m_Item; } protected set => m_Item = value; }
         /// <summary>
         /// 在未选择选项时使用的占位符
         /// </summary>
-        public GameObject Placeholder { get { return m_Placeholder; } set => m_Placeholder = value; }
+        public GameObject Placeholder { get { return m_Placeholder; } protected set => m_Placeholder = value; }
 
         /// <summary>
         /// 样式
         /// </summary>
-        public SytleGroup sytleGroup { get { return m_SytleGroup; } set => m_SytleGroup = value; }
+        public SytleGroup sytleGroup { get { return m_SytleGroup; } protected set => m_SytleGroup = value; }
 
         /// <summary>
         /// 当前数据项
@@ -234,36 +248,6 @@ namespace Framework
         }
 
 
-        #region 优化
-
-        [Header("保留的选项上限，清除时")]
-        [Header("优化设置")]
-        [Space]
-        [SerializeField] protected int itemReserveMax = 100;// 保留的选项上限，清除时
-
-        protected Sectionalizer m_Precreator = new Sectionalizer();
-        protected Sectionalizer m_Precleaner = new Sectionalizer();
-
-        /// <summary>
-        /// 预创建器
-        /// </summary>
-        protected Sectionalizer precreator
-        {
-            get { return m_Precreator; }
-        }
-        /// <summary>
-        /// 预清除器
-        /// </summary>
-        protected Sectionalizer precleaner
-        {
-            get { return m_Precleaner; }
-        }
-
-        public int ItemReserveMax { get => itemReserveMax; set => itemReserveMax = value; }
-
-
-        #endregion
-
         protected override void Awake()
         {
             base.Awake();
@@ -274,10 +258,10 @@ namespace Framework
         {
             base.Start();
 
-            if (!m_Template)    m_Template      = transform.FindOf<RectTransform>("Template");
-            if (!m_CaptionText) m_CaptionText   = transform.FindOf<Text>("Label");
-            if (!m_Placeholder) m_Placeholder   = transform.FindOf("Placeholder")?.gameObject;
-            if (!m_Item)        m_Item          = transform.FindOf("Item")?.gameObject;
+            if (!m_Template) m_Template = transform.FindOf<RectTransform>("Template");
+            if (!m_CaptionText) m_CaptionText = transform.FindOf<Text>("Label");
+            if (!m_Placeholder) m_Placeholder = transform.FindOf("Placeholder")?.gameObject;
+            if (!m_Item) m_Item = transform.FindOf("Item")?.gameObject;
             //if (!m_ItemText)    m_ItemText      = transform.FindOf<Text>("Item Label");
 
             precreator.InitializeStart(Coroutines.Instance, 1);
@@ -297,7 +281,7 @@ namespace Framework
 
         public void OnCancel(BaseEventData eventData)
         {
-            Debug.Log("OnCancel");
+            //Debug.Log("OnCancel");
 
             ShowMenu(false);
         }
@@ -314,7 +298,7 @@ namespace Framework
 
         public void OnSubmit(BaseEventData eventData)
         {
-            Debug.Log("OnSubmit");
+            //Debug.Log("OnSubmit");
 
             //ShowMenu();
         }
@@ -535,12 +519,6 @@ namespace Framework
             {
                 if (data == currentData)
                     CancelCurrentOption();
-            }
-
-            // 关闭菜单
-            if (m_SelectedCloseMenu)
-            {
-                ShowMenu(false);
             }
         }
 
@@ -971,7 +949,6 @@ namespace Framework
             {
                 currentItem.isOn = true;
             }
-
         }
         /// <summary>
         /// 取消当前勾选
@@ -1176,8 +1153,8 @@ namespace Framework
         /// <param name="item"></param>
         public virtual bool LocateTarget(DropdownItem item)
         {
-            if(!OptionItems.Contains(item)) return false;
-            if (!item?.gameObject)
+            if (!OptionItems.Contains(item)) return false;
+            if (!item.gameObject)
             {
                 //Log.Error($"未创建选项实例：{item}");
                 return false;
@@ -1186,8 +1163,8 @@ namespace Framework
             ScrollRect sr = m_ScrollRect;
             RectTransform rt = dataListMenu;
 
-            float locateProportion = LocateProportion;// 要显示的位置比例
-            float practicalLocation = rt.position.y * locateProportion;// 实际位置
+            float locationProportion = 0.3f;// 要显示的位置比例
+            float practicalLocation = rt.position.y * locationProportion;// 实际位置
 
             Vector3 pos = sr.content.position;
             pos.y = sr.content.position.y - (item.rectTransform.position.y - rt.position.y) - practicalLocation;
@@ -1243,7 +1220,7 @@ namespace Framework
                     captionText_text = currentData.text;
                 }
 
-                m_Placeholder?.gameObject.SetActive(false);
+                if (m_Placeholder) m_Placeholder.gameObject.SetActive(false);
             }
             else
             {
@@ -1252,7 +1229,7 @@ namespace Framework
                     captionText_text = "";
                 }
 
-                m_Placeholder?.gameObject.SetActive(true);
+                if (m_Placeholder) m_Placeholder.gameObject.SetActive(true);
             }
         }
 
@@ -1513,14 +1490,14 @@ namespace Framework
 
             public virtual void SetItem(GameObject item)
             {
-                item?.SetActive(true);
-                rectTransform = item?.GetComponent<RectTransform>();
-                this.toggle = item?.GetComponent<Toggle>();
-                this.m_ItemLabel = item?.transform.FindOf<Text>("Item Label");
-                this.bg = item?.transform.FindOf<Image>("Item Background");
-
                 if (item)
                 {
+                    item.SetActive(true);
+                    rectTransform = item.GetComponent<RectTransform>();
+                    this.toggle = item.GetComponent<Toggle>();
+                    this.m_ItemLabel = item.transform.FindOf<Text>("Item Label");
+                    this.bg = item.transform.FindOf<Image>("Item Background");
+
                     item.name = itemData.text;
                     itemLabel_text = itemData.text;
                 }

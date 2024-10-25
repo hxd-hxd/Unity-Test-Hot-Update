@@ -6,16 +6,16 @@ using UnityEngine;
 
 using Framework;
 using Framework.YooAssetExpress;
-using global::YooAsset;
+using YooAsset;
 
 namespace Test
 {
     public class GameStart : MonoBehaviour
     {
-        const float KB = 1024f;
-        const float MB = 1048576f;
-        const float GB = 1073741824f;
-        const float TB = 1099511627776f;
+        protected const float KB = 1024f;
+        protected const float MB = 1048576f;
+        protected const float GB = 1073741824f;
+        protected const float TB = 1099511627776f;
 
         [Header("资源下载服务器地址")]
         //string hostServerIP = "http://10.0.2.2"; //安卓模拟器地址
@@ -39,14 +39,14 @@ namespace Test
         /// 最大尝试下载次数
         /// </summary>
         [Header("最大尝试下载次数")]
-        [SerializeField] private int maxTryDownloadNum = 3;
+        [SerializeField] protected int maxTryDownloadNum = 3;
         /// <summary>
         /// 尝试下载次数
         /// </summary>
         [Header("尝试下载次数")]
-        [SerializeField] private int tryDownloadNum = 0;
+        [SerializeField] protected int tryDownloadNum = 0;
 
-        EDefaultBuildPipeline buildPipeline = EDefaultBuildPipeline.BuiltinBuildPipeline;
+        protected EDefaultBuildPipeline buildPipeline = EDefaultBuildPipeline.BuiltinBuildPipeline;
 
         /// <summary>
         /// 资源包的版本信息
@@ -58,8 +58,12 @@ namespace Test
         /// </summary>
         public ResourceDownloaderOperation Downloader { set; get; }
 
+        protected virtual void Awake()
+        {
+            ResourcesManager.SetHandler<YooAssetResourcesHandler>();
+        }
 
-        void Start()
+        protected virtual void Start()
         {
             YooAssets.Initialize();
             YooAssets.SetOperationSystemMaxTimeSlice(30);
@@ -71,7 +75,7 @@ namespace Test
         #region 资源热更流程
 
         // 初始化资源包
-        private IEnumerator InitPackage()
+        protected IEnumerator InitPackage()
         {
             //yield return new WaitForSeconds(1);
 
@@ -151,7 +155,7 @@ namespace Test
         }
 
         // 获取资源更新版本
-        private IEnumerator GetStaticVersion()
+        protected IEnumerator GetStaticVersion()
         {
             Debug.Log("------------------------------------获取最新的资源版本 !------------------------------------");
 
@@ -177,7 +181,7 @@ namespace Test
         }
 
         // 更新资源清单！
-        private IEnumerator UpdateManifest()
+        protected IEnumerator UpdateManifest()
         {
             Debug.Log("------------------------------------更新资源清单！------------------------------------");
 
@@ -201,7 +205,7 @@ namespace Test
         }
 
         // 创建补丁下载器！
-        private IEnumerator CreateDownloader()
+        protected IEnumerator CreateDownloader()
         {
             Debug.Log("------------------------------------创建补丁下载器！------------------------------------");
 
@@ -236,7 +240,7 @@ namespace Test
         }
 
         // 开始处理下载
-        private IEnumerator BeginDownload()
+        protected IEnumerator BeginDownload()
         {
             // 开始下载
             Downloader.OnStartDownloadFileCallback = (string fileName, long sizeBytes) =>
@@ -280,7 +284,7 @@ namespace Test
         }
 
         // 下载完毕
-        private void DownloadOver()
+        protected void DownloadOver()
         {
             Debug.Log("------------------------------------下载完毕------------------------------------");
 
@@ -288,7 +292,7 @@ namespace Test
         }
 
         // 清理未使用的缓存文件
-        private void ClearCache()
+        protected void ClearCache()
         {
             Debug.Log("清理未使用的缓存文件");
 
@@ -298,7 +302,7 @@ namespace Test
         }
 
         // 流程更新完毕
-        private void Operation_Completed(AsyncOperationBase obj)
+        protected void Operation_Completed(AsyncOperationBase obj)
         {
             Debug.Log("更新完毕");
 
@@ -326,7 +330,7 @@ namespace Test
         /// </summary>
         private void LoadDllFunc()
         {
-            LoadDllFunc("Assembly-CSharp.dll");
+            LoadDllFunc("Assembly-CSharp.dll.bytes");
             //LoadDllFunc("Assets/HotUpdateAssemblies/Use/Assembly-CSharp.dll.bytes");
         }
         /// <summary>
@@ -378,7 +382,7 @@ namespace Test
         /// <summary>
         /// 获取资源服务器地址
         /// </summary>
-        private string GetHostServerURL()
+        protected virtual string GetHostServerURL()
         {
 
             //#if UNITY_EDITOR

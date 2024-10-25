@@ -352,9 +352,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a913531765e59044a772ca702595f1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostServerIP: http://10.0.0.20:8080
-  resPath: Hot Update Test
-  gameVersion: v1.1.1
+  hostServerIP: http://192.168.3.126/
+  resPath: Unity-Test-Hot-Update%20%E7%83%AD%E6%9B%B4%E8%B5%84%E6%BA%90
+  gameVersion: v1.0
   packageName: DefaultPackage
   PlayMode: 0
   maxTryDownloadNum: 3

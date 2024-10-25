@@ -6,16 +6,17 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 using UnityEditor;
+using UnityEditorInternal;
+using UnityEditor.Compilation;
+
 using HybridCLR.Editor;
 using HybridCLR.Editor.Settings;
-using System.Linq;
 
 using FGUIUtility = Framework.Editor.GUIUtilityExtend;
-using UnityEditor.Compilation;
-using UnityEditorInternal;
 
 #pragma warning disable IDE0051 // 删除未使用的私有成员
 #pragma warning disable IDE0044 // 添加只读修饰符
@@ -30,7 +31,7 @@ namespace Framework.HybridCLRExpress
     /// </summary>
     public class AssembliesWindow : EditorWindow
     {
-        [MenuItem("Tools/Framework/HybridCLRAssembliesWindow")]
+        [MenuItem("Framework/HybridCLRAssembliesWindow")]
         static void Open()
         {
             var window = GetWindow<AssembliesWindow>("处理由 HybridCLR 生成的程序集");
@@ -40,6 +41,7 @@ namespace Framework.HybridCLRExpress
         FlatFoldoutBranch rootFoldout;
         bool showAllDll = false;// 显示所有平台 dll
         bool onlyShowCurrentPlatformDll = true;// 只显示当前平台 dll
+        bool dllCfgFoldout = false;
         Vector2 rootFoldoutSV = Vector2.zero;
         Vector2 fullSV = Vector2.zero;
 
@@ -103,6 +105,8 @@ namespace Framework.HybridCLRExpress
             }
         }
 
+        BuildTarget buildTarget => EditorUserBuildSettings.activeBuildTarget;
+
         private void OnEnable()
         {
             string dir = hotUpdateDLLDir;
@@ -124,8 +128,6 @@ namespace Framework.HybridCLRExpress
         private void OnGUI()
         {
             fullSV = EditorGUILayout.BeginScrollView(fullSV);
-
-            var target = EditorUserBuildSettings.activeBuildTarget;
 
             bool hotUpdateDLLDirExists = Directory.Exists(hotUpdateDLLDir);// 检查根目录是否存在
 
@@ -155,7 +157,7 @@ namespace Framework.HybridCLRExpress
                 {
                     GUILayout.Space(16);
                     GUILayout.Label("当前平台", GUILayout.MaxWidth(125));
-                    EditorGUILayout.LabelField(target.ToString());
+                    EditorGUILayout.LabelField(buildTarget.ToString());
                     if (!Directory.Exists(hotUpdateDLLDirCurPlatform)) GUILayout.Label("不存在", "RightLabel", GUILayout.MaxWidth(48));
                     if (GUILayout.Button("打开目录", GUILayout.MaxWidth(72)))
                     {
@@ -169,27 +171,32 @@ namespace Framework.HybridCLRExpress
             GUILayout.Space(8);
 
             // DLL 资源文件
-            EditorGUILayout.LabelField("热更新 DLL 文件", EditorStyles.boldLabel);
-            var dlls = GetHotUpdateAssemblyFiles();
-            EditorGUILayout.BeginVertical("box");
+            dllCfgFoldout = EditorGUILayout.BeginFoldoutHeaderGroup(dllCfgFoldout, "已配置的热更新 dll 文件");
+            EditorGUILayout.EndFoldoutHeaderGroup();
+            //EditorGUILayout.LabelField("已配置的热更新 dll 文件", EditorStyles.boldLabel);
+            if (dllCfgFoldout)
             {
-                foreach (var dllFile in dlls)
+                var dlls = GetHotUpdateAssemblyFiles();
+                EditorGUILayout.BeginVertical("box");
                 {
-                    EditorGUILayout.BeginHorizontal();
+                    foreach (var dllFile in dlls)
                     {
-                        GUILayout.Space(16);
-                        //GUILayout.Label(dllFile);
-                        EditorGUILayout.LabelField(dllFile);
-                        if (!File.Exists(dllFile)) GUILayout.Label("不存在", "RightLabel", GUILayout.MaxWidth(48));
-                        if (GUILayout.Button("打开目录", GUILayout.MaxWidth(72)))
+                        EditorGUILayout.BeginHorizontal();
                         {
-                            EditorUtility.RevealInFinder(dllFile);
+                            GUILayout.Space(16);
+                            //GUILayout.Label(dllFile);
+                            EditorGUILayout.LabelField(dllFile);
+                            if (!File.Exists(dllFile)) GUILayout.Label("文件不存在", "RightLabel", GUILayout.MaxWidth(64));
+                            if (GUILayout.Button("打开目录", GUILayout.MaxWidth(72)))
+                            {
+                                EditorUtility.RevealInFinder(dllFile);
+                            }
                         }
+                        EditorGUILayout.EndHorizontal();
                     }
-                    EditorGUILayout.EndHorizontal();
                 }
+                EditorGUILayout.EndVertical();
             }
-            EditorGUILayout.EndVertical();
 
             GUILayout.Space(8);
 
@@ -207,17 +214,26 @@ namespace Framework.HybridCLRExpress
             // 配置文件
             EditorGUILayout.ObjectField("相关保存配置", AssembliesUtility.cfg, AssembliesUtility.cfg.GetType(), false);
 
-            GUILayout.Space(8);
+            //GUILayout.Space(8);
 
             // 拷贝
+            //var r = EditorGUILayout.GetControlRect();
+            //Debug.Log(r);
+            EditorGUILayout.BeginHorizontal();
             GUILayout.Label("热更新程序集作为资源存放的路径");
-            copyPath = GUILayout.TextArea(copyPath, GUILayout.MinHeight(32));
             GUILayout.Label("当前要使用的 dll 存放的路径名");
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            copyPath = EditorGUILayout.TextArea(copyPath);
             currentUsePathName = EditorGUILayout.TextField(currentUsePathName);
-            //AssembliesUtility.cfg.copyPath = copyPath;
-            //copyCurPlatformDll = EditorGUILayout.ToggleLeft("拷贝当前平台 DLL", copyCurPlatformDll);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             copyAllDll = EditorGUILayout.Toggle("拷贝所有 DLL", copyAllDll);
             autoCopyUseDll = EditorGUILayout.Toggle("自动拷贝 DLL 到使用目录", autoCopyUseDll);
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("拷贝 当前 平台 DLL", whiteButtonStyle))
             {
                 AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath, copyAllDll);
@@ -232,12 +248,21 @@ namespace Framework.HybridCLRExpress
 
                 AssetDatabase.Refresh();
             }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("拷贝当前平台 DLL 到使用目录", whiteButtonStyle))
             {
                 AssembliesUtility.CopyToUseDir();
 
                 AssetDatabase.Refresh();
             }
+            if (GUILayout.Button("清除使用目录", whiteButtonStyle))
+            {
+                AssembliesUtility.ClearUseDir();
+
+                AssetDatabase.Refresh();
+            }
+            EditorGUILayout.EndHorizontal();
 
             GUILayout.Space(8);
 
@@ -335,11 +360,11 @@ namespace Framework.HybridCLRExpress
 
             //Debug.Log($"检查 {branchRoot.name}  文件夹：{dllPlatformDirs.Length}  可用文件：{dllPlatformFilesUsable.Count}  是否空显示：{folderEmpty}");
 
-            if (folderEmpty)
-            {
-                EditorGUILayout.LabelField(folderGUI);
-            }
-            else
+            //if (folderEmpty)
+            //{
+            //    EditorGUILayout.LabelField(folderGUI);
+            //}
+            //else
             {
                 //branchRoot.foldout = EditorGUILayout.Foldout(branchRoot.foldout, folderGUI, true);
                 branchRoot.foldout = EditorGUILayout.BeginFoldoutHeaderGroup(branchRoot.foldout, folderGUI);
@@ -370,14 +395,14 @@ namespace Framework.HybridCLRExpress
 
                     bool hotUpdate = dlls.Contains(dllFile);
 
-                    Action dllShowItem = () =>
+                    void dllShowItem_func()
                     {
                         // 分支
                         var branch = branchRoot.Expect(fileName);
                         branch.path = dllFile;
                         branch.isBranch = false;
                         branch.foldout = false;
-                        
+
                         // 程序集
                         //var assemblys = CompilationPipeline.GetAssemblies();
                         // 获取程序集定义文件路径
@@ -395,7 +420,7 @@ namespace Framework.HybridCLRExpress
                         //gui.text += branch.name;
                         EditorGUILayout.LabelField(gui, labelStyle);
 
-                        // 更改 HybridCLR 热更新程序集设置
+                        /// 更改 HybridCLR 热更新程序集设置
                         EditorGUI.BeginChangeCheck();
                         bool t = EditorGUILayout.Toggle(hotUpdate, GUILayout.MaxWidth(16));
                         //HybridCLRSettings
@@ -444,14 +469,22 @@ namespace Framework.HybridCLRExpress
                         EditorGUILayout.EndHorizontal();
                     };
 
-                    //dllShowItem();
+
+                    //// 显示所有程序集
+                    //dllShowItem_func();
+
                     if (showAllDll)
                     {
-                        dllShowItem();
+                        // 显示所有程序集
+                        dllShowItem_func();
                     }
                     else
                     {
-                        if (hotUpdate) dllShowItem();
+                        //// 只显示热更新程序集
+                        //if (hotUpdate) dllShowItem_func();
+
+                        // 只当前平台程序集
+                        if (branchRoot.name == buildTarget.ToString()) dllShowItem_func();
                     }
                 }
             }

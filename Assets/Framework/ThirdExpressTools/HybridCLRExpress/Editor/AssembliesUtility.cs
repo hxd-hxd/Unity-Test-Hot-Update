@@ -6,13 +6,13 @@ using System;
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using HybridCLR.Editor;
-using UnityEditor;
 using System.Linq;
-
 using System.Text;
-using System.Text.RegularExpressions;
+
+using UnityEngine;
+using UnityEditor;
+using HybridCLR.Editor;
+using Object = UnityEngine.Object;
 
 namespace Framework.HybridCLRExpress
 {
@@ -34,7 +34,7 @@ namespace Framework.HybridCLRExpress
 
                     if (!_cfg)
                     {
-                        _cfg = AssembliesCfg.Create();
+                        _cfg = Create();
 
                         //Debug.Log("未找到配置文件 AssembliesCfg，创建");
                     }
@@ -58,6 +58,34 @@ namespace Framework.HybridCLRExpress
         /// 热更新程序集文件排除保留
         /// </summary>
         public static List<string> HotUpdateAssemblyFilesExcludePreserved => SettingsUtil.HotUpdateAssemblyFilesExcludePreserved;
+
+        // 等同使用 CreateAssetMenu 的效果
+        //[MenuItem("Assets/Create/Framework HybridCLRExpress/Create Assemblies Cfg")]
+        static void InteriorCreate()
+        {
+            Create();
+        }
+        public static AssembliesCfg Create()
+        {
+            AssembliesCfg cfg = null;
+            string path = null;
+            Object target = Selection.activeObject;
+            if (target)
+            {
+                path = AssetDatabase.GetAssetPath(target);
+                if (File.Exists(path))
+                {
+                    path = Path.GetDirectoryName(path);
+                }
+            }
+            else
+            {
+                path = cfg.copyPath;
+            }
+            cfg = ScriptableObjectUtility.Create<AssembliesCfg>(path);
+            //cfg.copyPath = path;
+            return cfg;
+        }
 
         public static AssembliesCfg GetAssembliesCfg()
         {
@@ -244,7 +272,17 @@ namespace Framework.HybridCLRExpress
 
             }
         }
-
+        /// <summary>
+        /// 清除使用目录
+        /// </summary>
+        public static void ClearUseDir()
+        {
+            if (Directory.Exists(cfg.currentUsePath))
+            {
+                Directory.Delete(cfg.currentUsePath, true);
+                //Directory.CreateDirectory(cfg.currentUsePath);
+            }
+        }
 
         /// <summary>
         /// 获取要热更新的 DLL 文件

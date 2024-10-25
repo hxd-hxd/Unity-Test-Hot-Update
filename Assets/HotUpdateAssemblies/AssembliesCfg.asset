@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: AssembliesCfg
   m_EditorClassIdentifier: 
   copyPath: Assets/HotUpdateAssemblies
+  currentUsePathName: Use

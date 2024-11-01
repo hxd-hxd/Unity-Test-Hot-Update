@@ -144,7 +144,7 @@ namespace Framework.HybridCLRExpress
             {
                 EditorGUILayout.BeginHorizontal();
                 {
-                    GUILayout.Label("热更新 DLL 所在根目录", GUILayout.MaxWidth(141));
+                    GUILayout.Label("热更新 dll 所在根目录", GUILayout.MaxWidth(141));
                     EditorGUILayout.LabelField(hotUpdateDLLDir);
                     if (!hotUpdateDLLDirExists) GUILayout.Label("不存在", "RightLabel", GUILayout.MaxWidth(48));
                     if (GUILayout.Button("打开目录", GUILayout.MaxWidth(72)))
@@ -201,11 +201,11 @@ namespace Framework.HybridCLRExpress
             GUILayout.Space(8);
 
             // 拷贝操作
-            EditorGUILayout.LabelField("拷贝热更新 DLL 文件", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("拷贝热更新 dll 文件", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
             {
                 GUILayout.Space(16);
-                GUILayout.Label("为方便统一做热更新，可将 DLL 拷贝到 Assets 子目录下，用以配置 AssetsBundle", whiteStyle);
+                GUILayout.Label("为方便统一做热更新，可将 dll 拷贝到 Assets 子目录下，用以配置 AssetsBundle", whiteStyle);
             }
             EditorGUILayout.EndHorizontal();
 
@@ -229,19 +229,19 @@ namespace Framework.HybridCLRExpress
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            copyAllDll = EditorGUILayout.Toggle("拷贝所有 DLL", copyAllDll);
+            copyAllDll = EditorGUILayout.Toggle("拷贝所有 dll", copyAllDll);
             autoCopyUseDll = EditorGUILayout.Toggle("自动拷贝 DLL 到使用目录", autoCopyUseDll);
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("拷贝 当前 平台 DLL", whiteButtonStyle))
+            if (GUILayout.Button("拷贝 当前 平台 dll", whiteButtonStyle))
             {
                 AssembliesUtility.CopyHotUpdateAssembliesToDir(copyPath, copyAllDll);
                 if (autoCopyUseDll) AssembliesUtility.CopyToUseDir();
 
                 AssetDatabase.Refresh();
             }
-            if (GUILayout.Button("拷贝 所有 平台 DLL", whiteButtonStyle))
+            if (GUILayout.Button("拷贝 所有 平台 dll", whiteButtonStyle))
             {
                 AssembliesUtility.CopyAllHotUpdateAssembliesToDir(copyPath, copyAllDll);
                 if (autoCopyUseDll) AssembliesUtility.CopyToUseDir();
@@ -250,7 +250,7 @@ namespace Framework.HybridCLRExpress
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
-            if (GUILayout.Button("拷贝当前平台 DLL 到使用目录", whiteButtonStyle))
+            if (GUILayout.Button("拷贝当前平台 dll 到使用目录", whiteButtonStyle))
             {
                 AssembliesUtility.CopyToUseDir();
 
@@ -267,9 +267,9 @@ namespace Framework.HybridCLRExpress
             GUILayout.Space(8);
 
             // 树状结构
-            GUILayout.Label("查看 DLL ", EditorStyles.boldLabel);
+            GUILayout.Label("查看 dll ", EditorStyles.boldLabel);
             //showAllDll = EditorGUILayout.ToggleLeft("显示所有 DLL", showAllDll);
-            showAllDll = EditorGUILayout.Toggle("显示所有 DLL", showAllDll);
+            showAllDll = EditorGUILayout.Toggle("显示所有 dll", showAllDll);
             EditorGUILayout.BeginVertical("box");
             {
                 rootFoldoutSV = EditorGUILayout.BeginScrollView(rootFoldoutSV);
@@ -413,12 +413,15 @@ namespace Framework.HybridCLRExpress
                         EditorGUILayout.BeginHorizontal();
                         GUILayout.Space(16 * level);
 
-                        GUIContent gui = FGUIUtility.IconNew.AssemblyDefinitionAsset;// 程序集图标
-                        gui.tooltip = dllFile;
-                        gui.text = branch.name
+                        GUIContent icon = null;// 程序集图标
+                        if (isAsmdef)
+                            icon = FGUIUtility.IconNew.AssemblyDefinitionAsset;
+                        else icon = FGUIUtility.IconNew.Assembly;
+                        icon.tooltip = dllFile;
+                        icon.text = branch.name
                         + (hotUpdate ? "  <color=green>(已配置热更新)</color>" : null);
                         //gui.text += branch.name;
-                        EditorGUILayout.LabelField(gui, labelStyle);
+                        EditorGUILayout.LabelField(icon, labelStyle);
 
                         /// 更改 HybridCLR 热更新程序集设置
                         EditorGUI.BeginChangeCheck();

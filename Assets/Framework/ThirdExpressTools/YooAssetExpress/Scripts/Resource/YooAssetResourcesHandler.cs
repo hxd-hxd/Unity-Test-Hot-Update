@@ -19,6 +19,11 @@ namespace Framework
     /// </summary>
     public class YooAssetResourcesHandler : IResourcesHandler
     {
+        public void Initialize()
+        {
+            YooAssets.Initialize();
+        }
+
         public IAssetOperation LoadAsset(string path)
         {
             var h = YooAssets.LoadAssetSync(path);

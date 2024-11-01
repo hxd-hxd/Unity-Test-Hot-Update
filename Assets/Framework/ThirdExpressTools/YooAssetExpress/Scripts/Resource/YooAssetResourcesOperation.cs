@@ -26,7 +26,7 @@ namespace Framework
         private SceneHandle _sceneHandle;
 
         private Object[] _assetObjects;
-        internal Action _completed;
+        internal Action<YooAssetResourcesOperation> _completed;
 
         public YooAssetResourcesOperation()
         {
@@ -119,7 +119,7 @@ namespace Framework
 
         public Scene? SceneObject => sceneHandle?.SceneObject ?? null;
 
-        public event Action Completed
+        public event Action<IAssetOperation> Completed
         {
             add { _completed += value; }
             remove { _completed -= value; }
@@ -129,17 +129,17 @@ namespace Framework
         {
             _assetObjects = new Object[] { _assetHandle.AssetObject };
 
-            _completed?.Invoke();
+            _completed?.Invoke(this);
         }
         private void OnCompleted(AllAssetsHandle handle)
         {
             _assetObjects = _allAssetsHandle?.AllAssetObjects as Object[];
 
-            _completed?.Invoke();
+            _completed?.Invoke(this);
         }
         private void OnCompleted(SceneHandle handle)
         {
-            _completed?.Invoke();
+            _completed?.Invoke(this);
         }
 
         public T GetAssetObject<T>() where T : UnityEngine.Object

@@ -12,9 +12,9 @@ namespace Framework.Event
     /// <summary>
     /// 事件组
     /// </summary>
-    public class EventGroup
+    public class EventGroup : ITypePoolObject
     {
-        static Dictionary<string, LinkedList<Delegate>> _entrepot = new Dictionary<string, LinkedList<Delegate>>(20);
+        Dictionary<string, LinkedList<Delegate>> _entrepot = new Dictionary<string, LinkedList<Delegate>>(20);
 
         /// <summary>添加侦听，以 <see cref="Type.GetHashCode"/> 为 id</summary>
         public void AddListener<T>(Action listener)

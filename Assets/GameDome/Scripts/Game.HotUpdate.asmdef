@@ -1,5 +1,5 @@
 {
-    "name": "Game",
+    "name": "Game.HotUpdate",
     "rootNamespace": "",
     "references": [
         "GUID:5cf10eb1c5acd1440ba8519ef5553216",

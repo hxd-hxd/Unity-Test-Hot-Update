@@ -1,5 +1,5 @@
 {
-    "name": "GameLocal",
+    "name": "Game.Local",
     "rootNamespace": "",
     "references": [
         "GUID:0dc2171ec43c18749864bd4f201a01ab",

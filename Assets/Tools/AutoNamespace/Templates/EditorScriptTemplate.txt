@@ -37,3 +37,6 @@ namespace #_NAME_SPACE_#
         }
     }
 }
+
+#pragma warning restore 0414
+#pragma warning restore 0219

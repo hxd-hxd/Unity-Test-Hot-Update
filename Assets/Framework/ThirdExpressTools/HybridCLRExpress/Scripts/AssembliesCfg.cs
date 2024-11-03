@@ -36,39 +36,10 @@ namespace Framework.HybridCLRExpress
         public string currentUsePathName = "Use";
 
         /// <summary>
-        /// 当前要使用的 dll 存放的完整路径（copyPath/currentUsePathName）
+        /// 当前要使用的 dll 存放的完整路径（<see cref="copyPath"/>/<see cref="currentUsePathName"/>）
         /// </summary>
         public string currentUsePath => Path.Combine(copyPath, currentUsePathName);
 
-#if UNITY_EDITOR
-        // 等同使用 CreateAssetMenu 的效果
-        [MenuItem("Assets/Create/Framework HybridCLRExpress/Create Assemblies Cfg")]
-        static void InteriorCreate()
-        {
-            Create();
-        }
-        public static AssembliesCfg Create()
-        {
-            AssembliesCfg cfg = null;
-            string path = null;
-            Object target = Selection.activeObject;
-            if (target)
-            {
-                path = AssetDatabase.GetAssetPath(target);
-                if (File.Exists(path))
-                {
-                    path = Path.GetDirectoryName(path);
-                }
-            }
-            else
-            {
-                path = cfg.copyPath;
-            }
-            cfg = ScriptableObjectUtility.Create<AssembliesCfg>(path);
-            //cfg.copyPath = path;
-            return cfg;
-        }
-#endif
     }
 }
 

@@ -1,11 +1,14 @@
 {
-    "name": "Framework.Local.YooAssetExpress",
+    "name": "Game.Local",
     "rootNamespace": "",
     "references": [
+        "GUID:0dc2171ec43c18749864bd4f201a01ab",
+        "GUID:b8cc97ae4b7c5f540bb325c792dafd68",
+        "GUID:5cf10eb1c5acd1440ba8519ef5553216",
         "GUID:e34a5702dd353724aa315fb8011f08c3",
         "GUID:40b920247735fe44c88e1b23dff8cd6a",
-        "GUID:0dc2171ec43c18749864bd4f201a01ab",
-        "GUID:5cf10eb1c5acd1440ba8519ef5553216"
+        "GUID:13ba8ce62aa80c74598530029cb2d649",
+        "GUID:6055be8ebefd69e48b49212b09b47b2f"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

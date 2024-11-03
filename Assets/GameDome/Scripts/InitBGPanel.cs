@@ -28,7 +28,7 @@ namespace Test
             {
                 Log.Debuger("开始加载 RightPanel");
 
-                var asset = YooAssets.LoadAssetAsync<GameObject>("RightPanel");
+                var asset = ResourcesManager.LoadAssetAsync<GameObject>("RightPanel");
 
                 Log.Debuger($"加载结果 {asset}");
 

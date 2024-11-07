@@ -21,8 +21,8 @@ namespace Framework.HybridCLRExpress
     [CreateAssetMenu(menuName = "Framework HybridCLRExpress/Assemblies Cfg", fileName = "Assemblies Cfg")]
     public class AssembliesCfg : ScriptableObject
     {
-        [Header("热更新程序集作为资源存放的路径")]
         [Header("保存 HybridCLR 生成程序集相关操作的设置")]
+        [Header("热更新程序集作为资源存放的路径")]
 
         /// <summary>
         /// 要拷贝到的目标路径 

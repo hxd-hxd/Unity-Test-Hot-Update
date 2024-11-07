@@ -268,7 +268,7 @@ namespace Framework.HybridCLRExpress
                     continue;
                 }
                 File.Copy(dllPath, dllTargetPath, true);
-                Debug.Log($"[{nameof(CopyToUseDir)}] 拷贝热更新 dll \r\n{dllPath} -> {dllTargetPath}");
+                Debug.Log($"[{nameof(CopyToUseDir)}] 拷贝热更新 dll 完成\r\n{dllPath} -> {dllTargetPath}");
 
             }
         }

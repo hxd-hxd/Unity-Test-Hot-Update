@@ -51,8 +51,11 @@ namespace Framework
             set
             {
                 _assetHandle = value;
-                _assetHandle.Completed -= OnCompleted;
-                _assetHandle.Completed += OnCompleted;
+                if (value != null)
+                {
+                    value.Completed -= OnCompleted;
+                    value.Completed += OnCompleted;
+                }
             }
         }
         internal AllAssetsHandle allAssetsHandle
@@ -61,8 +64,11 @@ namespace Framework
             set
             {
                 _allAssetsHandle = value;
-                _allAssetsHandle.Completed -= OnCompleted;
-                _allAssetsHandle.Completed += OnCompleted;
+                if (value != null)
+                {
+                    value.Completed -= OnCompleted;
+                    value.Completed += OnCompleted;
+                }
             }
         }
         internal SceneHandle sceneHandle
@@ -71,8 +77,11 @@ namespace Framework
             set
             {
                 _sceneHandle = value;
-                _sceneHandle.Completed -= OnCompleted;
-                _sceneHandle.Completed += OnCompleted;
+                if (value != null)
+                {
+                    value.Completed -= OnCompleted;
+                    value.Completed += OnCompleted;
+                }
             }
         }
         internal HandleBase handleBase
@@ -86,18 +95,20 @@ namespace Framework
             }
         }
 
-        public bool IsDone => handleBase.IsDone;
+        public bool IsDone => handleBase?.IsDone ?? true;
 
-        public float Progress => handleBase.Progress;
+        public float Progress => handleBase?.Progress ?? 1;
 
-        public bool IsValid => handleBase.IsValid;
+        public bool IsValid => handleBase?.IsValid ?? false;
 
-        public string DebugText => handleBase.LastError;
+        public string DebugText => handleBase?.LastError ?? "空";
 
         public AsyncOperationStatus Status
         {
             get
             {
+                if (handleBase == null) return AsyncOperationStatus.None;
+
                 switch (handleBase.Status)
                 {
                     case EOperationStatus.None:
@@ -146,12 +157,12 @@ namespace Framework
         {
             return _assetHandle.GetAssetObject<T>();
         }
-        public T[] GetAllAssetObjectS<T>() where T : UnityEngine.Object
+        public T[] GetAllAssetObjects<T>() where T : UnityEngine.Object
         {
             if (_assetObjects == null) return default;
 
-            var objects = new List<T>(_assetObjects.Length);
-            foreach (T tObj in _assetObjects)
+            var objects = new List<T>();
+            foreach (T tObj in _assetObjects) 
             {
                 if (tObj != null)
                 {

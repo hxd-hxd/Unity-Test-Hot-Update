@@ -17,7 +17,7 @@ namespace Framework.YooAssetExpress
     class GameResHotUpdateInspector : Editor
     {
         GUIStyle _labelStyle;
-        GUIStyle labelStyle { get => _labelStyle ??= new GUIStyle(EditorStyles.label) { wordWrap = true, richText = true }; }
+        GUIStyle labelStyle { get => _labelStyle ??= new GUIStyle(EditorStyles.label) { wordWrap = true, richText = true, stretchHeight = true }; }
 
         GameResHotUpdate my => (GameResHotUpdate)target;
 
@@ -36,6 +36,14 @@ namespace Framework.YooAssetExpress
                 EditorGUILayout.LabelField(@$"<b>服务器资源地址</b>
   地址格式：""资源下载服务器地址/资源在服务器上的根路径/当前平台/游戏版本""
   完整地址：{my.GetHostServerURL()}", labelStyle);
+                //              EditorGUILayout.SelectableLabel(@$"<b>服务器资源地址</b>
+                //地址格式：""资源下载服务器地址/资源在服务器上的根路径/当前平台/游戏版本""
+                //完整地址：{my.GetHostServerURL()}
+                //", labelStyle);
+                if (GUILayout.Button("打开链接"))
+                {
+                    Application.OpenURL(my.GetHostServerURL());
+                }
 
                 EditorGUILayout.EndVertical();
             }
@@ -79,16 +87,13 @@ namespace Framework.YooAssetExpress
         [Header("资源系统模式")]
         public EPlayMode PlayMode = EPlayMode.EditorSimulateMode;
 
-        /// <summary>
-        /// 最大尝试下载次数
-        /// </summary>
-        [Header("最大尝试下载次数")]
-        [SerializeField] protected int maxTryDownloadNum = 3;
-        /// <summary>
-        /// 尝试下载次数
-        /// </summary>
-        [Header("已尝试下载次数")]
-        [SerializeField] protected int tryDownloadNum = 0;
+        [Header("需要热更新的 dll 文件，例如\r\n“Assembly-CSharp.dll.bytes”填\r\n“Assembly-CSharp.dll”或者\r\n“Assets/HotUpdateAssemblies/Use/Assembly-CSharp.dll.bytes”")]
+        public List<string> hotUpdateDlls = new List<string>();
+
+        //[Header("最大尝试下载次数")]
+        //[SerializeField] protected int maxTryDownloadNum = 3;
+        //[Header("已尝试下载次数")]
+        //[SerializeField] protected int tryDownloadNum = 0;
 
         protected EDefaultBuildPipeline buildPipeline = EDefaultBuildPipeline.BuiltinBuildPipeline;
 
@@ -319,7 +324,7 @@ namespace Framework.YooAssetExpress
 
             //yield return new WaitForSecondsRealtime(0.5f);
 
-            tryDownloadNum++;
+            //tryDownloadNum++;
 
             int downloadingMaxNum = 10;
             int failedTryAgain = 3;
@@ -329,7 +334,7 @@ namespace Framework.YooAssetExpress
 
             if (Downloader.TotalDownloadCount == 0)
             {
-                //Debug.Log("没有找到任何下载文件！");
+                Debug.Log("没有找到任何下载文件！");
 
                 HotUpdateDone();
             }
@@ -400,7 +405,7 @@ namespace Framework.YooAssetExpress
         // 下载完毕
         protected void DownloadOver()
         {
-            //Debug.Log("------------------------------------下载完毕------------------------------------");
+            Debug.Log("------------------------------------下载完毕------------------------------------");
 
             ClearCache();
         }
@@ -424,23 +429,21 @@ namespace Framework.YooAssetExpress
         protected void HotUpdateDone()
         {
 
-//            Debug.Log("更新完毕");
+            Debug.Log("------------------------------------热更新完毕------------------------------------");
 
-//            //LoadDLL.LoadMetadataForAOTAssemblies();
-//            // 加载程序集
-//#if !UNITY_EDITOR
-//            LoadDllFunc();
-//#endif
+            //LoadDLL.LoadMetadataForAOTAssemblies();
+            // 加载程序集
+#if !UNITY_EDITOR
+                        LoadDllFunc();
+#endif
 
-//            Debug.Log("开始游戏");
-
-//            // 跳转场景
-//            Debug.Log("开始加载场景 ---》Login《--- ");
-//            var sceneOperation = YooAssets.LoadSceneAsync("Login");
-//            sceneOperation.Completed += (_) =>
-//            {
-//                Debug.Log($"加载场景 ---》{sceneOperation.SceneObject.name}《--- 成功");
-//            };
+            //// 跳转场景
+            //Debug.Log("开始加载场景 ---》Login《--- ");
+            //var sceneOperation = YooAssets.LoadSceneAsync("Login");
+            //sceneOperation.Completed += (_) =>
+            //{
+            //    Debug.Log($"加载场景 ---》{sceneOperation.SceneObject.name}《--- 成功");
+            //};
 
             PatchEventDefine.UpdateDone.SendEventMessage();
         }
@@ -452,27 +455,35 @@ namespace Framework.YooAssetExpress
         /// </summary>
         private void LoadDllFunc()
         {
-            LoadDllFunc("Assembly-CSharp.dll.bytes");
+            //LoadDllFunc("Assembly-CSharp.dll.bytes");
             //LoadDllFunc("Assets/HotUpdateAssemblies/Use/Assembly-CSharp.dll.bytes");
+
+            for (int i = 0; i < hotUpdateDlls.Count; i++)
+            {
+                string dllName = hotUpdateDlls[i];
+                LoadDllFunc(dllName);
+            }
         }
         /// <summary>
         ///  加载 dll 程序集
         /// </summary>
-        private void LoadDllFunc(string location)
+        private void LoadDllFunc(string dllLocation)
         {
             if (!islog) return;
             islog = false;
 
-            Log.Yellow("开始加载 dll 程序集");
+            Log.Yellow($"开始加载 dll 程序集；{dllLocation}");
 
-            var aoh = YooAssets.LoadAssetSync<TextAsset>(location);
+            var aoh = YooAssets.LoadAssetSync<TextAsset>(dllLocation);
 
-            Debug.Log($"处理器：{aoh}，{location}");
-            //Debug.Log($"Address：{aoh.GetAssetInfo().Address}，AssetPath：{aoh.GetAssetInfo().AssetPath}，AssetType：{aoh.GetAssetInfo().AssetType}，");
+            Debug.Log($"处理器：{aoh}");
+            var assetInfo = aoh.GetAssetInfo();
+            if (assetInfo != null)
+                Debug.Log($"资产信息，Address：{assetInfo.Address}，AssetPath：{assetInfo.AssetPath}，AssetType：{assetInfo.AssetType}");
 
             TextAsset csDll = aoh?.GetAssetObject<TextAsset>();
 
-            Debug.Log($"文本资源：{csDll != null}，{location}");
+            Debug.Log($"转换为文本资源：{csDll != null}");
 
             byte[] dllDatas = csDll ? csDll.bytes : null;
 
@@ -480,13 +491,13 @@ namespace Framework.YooAssetExpress
 
             if (dllDatas != null)
             {
-                Debug.Log($"开始加载程序集 ---》{location}《---");
+                Debug.Log($"开始加载程序集 ---》{dllLocation}《---");
                 System.Reflection.Assembly.Load(dllDatas);
-                Log.Striking($"加载程序集 ---》{location}《--- 完毕");
+                Log.Striking($"加载程序集 ---》{dllLocation}《--- 完毕");
             }
             else
             {
-                Log.Error($"不存在程序集 ---》{location}《---");
+                Log.Error($"不存在程序集 ---》{dllLocation}《---");
             }
         }
         bool islog = true;
@@ -528,7 +539,8 @@ namespace Framework.YooAssetExpress
             //#endif
 
 
-            return $"{hostServerIP}/{resPath}/{PlatformUtility.platform}/{gameVersion}";
+            //return $"{hostServerIP}/{resPath}/{PlatformUtility.platform}/{gameVersion}";
+            return Path.Combine(hostServerIP, resPath, PlatformUtility.platform.ToString(), gameVersion);
         }
 
     }

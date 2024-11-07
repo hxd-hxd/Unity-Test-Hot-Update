@@ -3,10 +3,6 @@
 // -------------------------
 
 using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 using YooAsset;
 using UnityEngine.SceneManagement;
@@ -24,6 +20,27 @@ namespace Framework
             YooAssets.Initialize();
         }
 
+        public Object LoadAssetObject(string path)
+        {
+            var operation = LoadAsset(path);
+            var obj = operation.AssetObject;
+            operation.Release();
+            return obj;
+        }
+        public TObject LoadAssetObject<TObject>(string path) where TObject : Object
+        {
+            var operation = LoadAsset<TObject>(path);
+            var obj = operation.GetAssetObject<TObject>();
+            operation.Release();
+            return obj;
+        }
+        public Object LoadAssetObject(string path, Type type)
+        {
+            var operation = LoadAsset(path, type);
+            var obj = operation.AssetObject;
+            operation.Release();
+            return obj;
+        }
         public IAssetOperation LoadAsset(string path)
         {
             var h = YooAssets.LoadAssetSync(path);
@@ -56,6 +73,27 @@ namespace Framework
             return YooAssetResourcesOperation.Get(h);
         }
 
+        public Object[] LoadAllAssetObjects(string path)
+        {
+            var operation = LoadAllAssets(path);
+            var obj = operation.AssetObjects;
+            operation.Release();
+            return obj;
+        }
+        public TObject[] LoadAllAssetObjects<TObject>(string path) where TObject : Object
+        {
+            var operation = LoadAllAssets<TObject>(path);
+            var obj = operation.GetAllAssetObjects<TObject>();
+            operation.Release();
+            return obj;
+        }
+        public Object[] LoadAllAssetObjects(string path, Type type)
+        {
+            var operation = LoadAllAssets(path, type);
+            var obj = operation.AssetObjects;
+            operation.Release();
+            return obj;
+        }
         public IAssetOperation LoadAllAssets(string path)
         {
             var h = YooAssets.LoadAllAssetsSync(path);
@@ -87,6 +125,13 @@ namespace Framework
             return YooAssetResourcesOperation.Get(h);
         }
 
+        public Scene LoadSceneObject(string path, LoadSceneMode sceneMode, LocalPhysicsMode physicsMode)
+        {
+            var operation = LoadScene(path, sceneMode, physicsMode);
+            var obj = operation.SceneObject != null ? operation.SceneObject.Value : default;
+            operation.Release();
+            return obj;
+        }
         public IAssetOperation LoadScene(string path, LoadSceneMode sceneMode, LocalPhysicsMode physicsMode)
         {
             var h = YooAssets.LoadSceneSync(path, sceneMode, physicsMode);

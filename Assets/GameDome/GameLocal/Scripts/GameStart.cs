@@ -12,7 +12,7 @@ namespace Test
     public class GameStart : MonoBehaviour
     {
         
-        protected virtual void Awake()
+        private void Awake()
         {
             EventCenter.AddListener<PatchEventDefine.UpdateDone>(OnHandleEvent);
         }

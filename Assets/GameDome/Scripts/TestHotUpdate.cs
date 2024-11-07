@@ -15,6 +15,6 @@ namespace Test
 {
     public class TestHotUpdate
     {
-        public static string name = "修改后 789729";
+        public static readonly string name = "测试脚本热更的代码修改后 789729";
     }
 }

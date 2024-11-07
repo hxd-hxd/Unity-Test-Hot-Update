@@ -20,6 +20,12 @@ namespace Framework
         /// <summary>初始化</summary>
         void Initialize();
 
+        /// <summary>同步加载资源对象</summary>
+        Object LoadAssetObject(string path);
+        /// <summary>同步加载资源对象</summary>
+        TObject LoadAssetObject<TObject>(string path) where TObject : Object;
+        /// <summary>同步加载资源对象</summary>
+        Object LoadAssetObject(string path, Type type);
         /// <summary>同步加载资源</summary>
         IAssetOperation LoadAsset(string path);
         /// <summary>同步加载资源</summary>
@@ -34,6 +40,12 @@ namespace Framework
         IAssetOperation LoadAssetAsync(string path, Type type);
 
         /// <summary>同步加载所有资源对象</summary>
+        Object[] LoadAllAssetObjects(string path);
+        /// <summary>同步加载所有资源对象</summary>
+        TObject[] LoadAllAssetObjects<TObject>(string path) where TObject : Object;
+        /// <summary>同步加载所有资源对象</summary>
+        Object[] LoadAllAssetObjects(string path, Type type);
+        /// <summary>同步加载所有资源对象</summary>
         IAssetOperation LoadAllAssets(string path);
         /// <summary>同步加载所有资源对象</summary>
         IAssetOperation LoadAllAssets<TObject>(string path) where TObject : Object;
@@ -46,6 +58,8 @@ namespace Framework
         /// <summary>异步加载所有资源对象</summary>
         IAssetOperation LoadAllAssetsAsync(string path, Type type);
 
+        /// <summary>同步加载场景</summary>
+        Scene LoadSceneObject(string path, LoadSceneMode sceneMode, LocalPhysicsMode physicsMode);
         /// <summary>同步加载场景</summary>
         IAssetOperation LoadScene(string path, LoadSceneMode sceneMode, LocalPhysicsMode physicsMode);
         /// <summary>异步加载场景</summary>

@@ -89,7 +89,7 @@ namespace Framework
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        T[] GetAllAssetObjectS<T>() where T : Object;
+        T[] GetAllAssetObjects<T>() where T : Object;
     }
 
     /// <summary>

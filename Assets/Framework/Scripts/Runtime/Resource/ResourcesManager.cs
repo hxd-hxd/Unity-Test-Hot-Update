@@ -52,26 +52,20 @@ namespace Framework
         /// <summary>同步加载资源对象</summary>
         public static Object LoadAssetObject(string path)
         {
-            var operation = LoadAsset(path);
-            var obj = operation.AssetObject;
-            operation.Release();
-            return obj;
+            if (_handler == null) throw new NullReferenceException("未设置资源处理器");
+            return _handler.LoadAssetObject(path);
         }
         /// <summary>同步加载资源对象</summary>
         public static TObject LoadAssetObject<TObject>(string path) where TObject : Object
         {
-            var operation = LoadAsset<TObject>(path);
-            var obj = operation.GetAssetObject<TObject>();
-            operation.Release();
-            return obj;
+            if (_handler == null) throw new NullReferenceException("未设置资源处理器");
+            return _handler.LoadAssetObject<TObject>(path);
         }
         /// <summary>同步加载资源对象</summary>
         public static Object LoadAssetObject(string path, Type type)
         {
-            var operation = LoadAsset(path, type);
-            var obj = operation.AssetObject;
-            operation.Release();
-            return obj;
+            if (_handler == null) throw new NullReferenceException("未设置资源处理器");
+            return _handler.LoadAssetObject(path, type);
         }
         /// <summary>同步加载资源</summary>
         public static IAssetOperation LoadAsset(string path)
@@ -114,26 +108,20 @@ namespace Framework
         /// <summary>同步加载所有资源对象</summary>
         public static Object[] LoadAllAssetObjects(string path)
         {
-            var operation = LoadAllAssets(path);
-            var obj = operation.AssetObjects;
-            operation.Release();
-            return obj;
+            if (_handler == null) throw new NullReferenceException("未设置资源处理器");
+            return _handler.LoadAllAssetObjects(path);
         }
         /// <summary>同步加载所有资源对象</summary>
         public static TObject[] LoadAllAssetObjects<TObject>(string path) where TObject : Object
         {
-            var operation = LoadAllAssets<TObject>(path);
-            var obj = operation.GetAllAssetObjectS<TObject>();
-            operation.Release();
-            return obj;
+            if (_handler == null) throw new NullReferenceException("未设置资源处理器");
+            return _handler.LoadAllAssetObjects<TObject>(path);
         }
         /// <summary>同步加载所有资源对象</summary>
         public static Object[] LoadAllAssetObjects(string path, Type type)
         {
-            var operation = LoadAllAssets(path, type);
-            var obj = operation.AssetObjects;
-            operation.Release();
-            return obj;
+            if (_handler == null) throw new NullReferenceException("未设置资源处理器");
+            return _handler.LoadAllAssetObjects(path, type);
         }
         /// <summary>同步加载所有资源</summary>
         public static IAssetOperation LoadAllAssets(string path)
@@ -176,11 +164,7 @@ namespace Framework
         public static Scene LoadSceneObject(string path, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None)
         {
             if (_handler == null) throw new NullReferenceException("未设置资源处理器");
-            //return _handler.LoadScene(path, sceneMode, physicsMode);
-            var operation = LoadScene(path, sceneMode, physicsMode);
-            var obj = operation.SceneObject.Value;
-            operation.Release();
-            return obj;
+            return _handler.LoadSceneObject(path, sceneMode, physicsMode);
         }
         /// <summary>同步加载场景</summary>
         public static IAssetOperation LoadScene(string path, LoadSceneMode sceneMode = LoadSceneMode.Single, LocalPhysicsMode physicsMode = LocalPhysicsMode.None)
@@ -209,8 +193,6 @@ namespace Framework
         {
             if (_handler == null)
             {
-                if (_handler.GetType() == typeof(T)) return;
-
                 _handler = new T();
             }
         }

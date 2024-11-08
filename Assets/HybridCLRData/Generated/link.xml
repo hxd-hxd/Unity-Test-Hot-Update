@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <linker>
+  <assembly fullname="Framework.Local">
+    <type fullname="Framework.IAssetOperation" preserve="all" />
+    <type fullname="Framework.ResourcesManager" preserve="all" />
+  </assembly>
   <assembly fullname="Framework.Runtime">
     <type fullname="Framework.ExtendUtility" preserve="all" />
-    <type fullname="Framework.IAssetOperation" preserve="all" />
     <type fullname="Framework.Log" preserve="all" />
-    <type fullname="Framework.ResourcesManager" preserve="all" />
   </assembly>
   <assembly fullname="UnityEngine.CoreModule">
     <type fullname="UnityEngine.Component" preserve="all" />

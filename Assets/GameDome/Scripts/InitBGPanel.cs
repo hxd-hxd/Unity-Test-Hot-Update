@@ -47,7 +47,7 @@ namespace Test
                 //};
             });
 
-            transform.FindOf<Text>("HotUpdateText").text = "2";
+            transform.FindOf<Text>("HotUpdateText").text = "567";
 
             Log.Striking(TestHotUpdate.name);
         }

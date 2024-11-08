@@ -86,7 +86,7 @@ MonoBehaviour:
         UserData: 
   - PackageName: SelectivityPackage
     PackageDesc: "\u7531\u7528\u6237\u9009\u62E9\u6027\u4E0B\u8F7D\u7684\u8D44\u6E90\u5305"
-    EnableAddressable: 0
+    EnableAddressable: 1
     LocationToLower: 0
     IncludeAssetGUID: 0
     AutoCollectShaders: 1

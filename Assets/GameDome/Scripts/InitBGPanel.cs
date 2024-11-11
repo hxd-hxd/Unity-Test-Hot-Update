@@ -28,15 +28,15 @@ namespace Test
             {
                 Log.Debuger("开始加载 RightPanel");
 
-                var asset = ResourcesManager.LoadAssetAsync<GameObject>("RightPanel");
+                var ao = ResourcesManager.LoadAssetAsync<GameObject>("RightPanel");
 
-                Log.Debuger($"加载结果 {asset}");
+                Log.Debuger($"加载结果 {ao}");
 
-                await asset.Task;
+                await ao.Task;
 
-                Log.Debuger($"加载完成 {asset}");
+                Log.Debuger($"加载完成 {ao.Status}");
 
-                Log.Debuger($"实例化 {Instantiate(asset.AssetObject)}");
+                Log.Debuger($"实例化 {Instantiate(ao.AssetObject)}");
 
                 //asset.Completed += (_) =>
                 //{
@@ -45,6 +45,8 @@ namespace Test
                 //    Log.Debuger($"实例化 {Instantiate(asset.AssetObject)}");
 
                 //};
+
+                ao.Release();
             });
 
             transform.FindOf<Text>("HotUpdateText").text = "2";

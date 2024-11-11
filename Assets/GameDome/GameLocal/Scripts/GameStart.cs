@@ -11,7 +11,7 @@ namespace Test
 {
     public class GameStart : MonoBehaviour
     {
-        
+
         private void Awake()
         {
             EventCenter.AddListener<PatchEventDefine.UpdateDone>(OnHandleEvent);
@@ -33,6 +33,8 @@ namespace Test
             sceneOperation.Completed += (_) =>
             {
                 Debug.Log($"加载场景 ---》{sceneOperation.SceneObject.Value.name}《--- 成功");
+
+                _.Release();
             };
         }
     }

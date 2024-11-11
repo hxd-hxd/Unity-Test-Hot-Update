@@ -84,6 +84,19 @@ MonoBehaviour:
         FilterRuleName: CollectAll
         AssetTags: 
         UserData: 
+    - GroupName: pack
+      GroupDesc: "\u968F\u5305\u53D1\u5E03\u7684\u8D44\u6E90"
+      AssetTags: pack
+      ActiveRuleName: EnableGroup
+      Collectors:
+      - CollectPath: Assets/GameDome/GameLocal/Prefabs/UIPanel
+        CollectorGUID: 9ddc2517b9fb83f4f8c0373edca94dc3
+        CollectorType: 0
+        AddressRuleName: AddressByFileName
+        PackRuleName: PackSeparately
+        FilterRuleName: CollectAll
+        AssetTags: 
+        UserData: 
   - PackageName: SelectivityPackage
     PackageDesc: "\u7531\u7528\u6237\u9009\u62E9\u6027\u4E0B\u8F7D\u7684\u8D44\u6E90\u5305"
     EnableAddressable: 1

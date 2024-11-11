@@ -7,4 +7,5 @@ using Framework;
 public class MyAOTGenericReferences : MonoBehaviour
 {
     IAssetOperation assetOperation;
+
 }
